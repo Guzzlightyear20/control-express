@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Control Interno Express - Aniversario I (02/10 al 08/10/2026)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { -webkit-tap-highlight-color: transparent; }
+        ::-webkit-scrollbar { height: 6px; width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+        @media print {
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            body { background: white; color: black; }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans min-h-full flex flex-col antialiased selection:bg-blue-600 selection:text-white pb-16 lg:pb-0">
+
+    <!-- HEADER -->
+    <header class="bg-slate-900 text-white sticky top-0 z-40 shadow-lg border-b border-slate-800 no-print">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 py-2.5">
+            <div class="flex items-center justify-between gap-2">
+                <!-- Title & Badge -->
+                <div class="flex items-center gap-2.5 min-w-0">
+                    <div class="p-2 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl text-white shrink-0 shadow-md">
+                        <i class="fa-solid fa-clipboard-check text-lg sm:text-xl"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <div class="flex items-center gap-1.5">
+                            <h1 class="text-base sm:text-lg font-black tracking-tight truncate leading-tight">
+                                Control Express
+                            </h1>
+                            <span class="bg-emerald-500/20 text-emerald-300 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-500/30">
+                                Internas Express - Aniversario I
+                            </span>
+                        </div>
+                        <p class="text-[11px] text-slate-400 truncate">
+                            Vigencias: <span class="text-emerald-400 font-semibold">02/10/2026 al 08/10/2026</span> • <span id="header-total-badge" class="text-blue-300 font-semibold">0 SKUs</span>
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Quick Actions -->
+                <div class="flex items-center gap-1.5 shrink-0">
+                    <button onclick="openImportModal()" class="px-2.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all">
+                        <i class="fa-solid fa-file-import"></i>
+                        <span class="hidden sm:inline">Pegar / Agregar Planilla</span>
+                    </button>
+                    <button onclick="switchTab('tab-checklist')" class="px-2.5 py-1.5 bg-blue-600 active:bg-blue-700 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all">
+                        <i class="fa-solid fa-list-check"></i>
+                        <span class="hidden sm:inline">Checklist Turno</span>
+                    </button>
+                    <button onclick="exportToCSV()" class="p-2 bg-emerald-600 text-white rounded-lg text-xs font-semibold flex items-center gap-1 shadow-sm">
+                        <i class="fa-solid fa-download text-sm"></i>
+                        <span class="hidden lg:inline">Exportar CSV</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="bg-slate-950 border-t border-slate-800 px-3 sm:px-6">
+            <div class="max-w-7xl mx-auto flex items-center gap-1 sm:gap-2 overflow-x-auto py-1 text-xs font-semibold no-scrollbar">
+                <button id="nav-promos" onclick="switchTab('tab-promos')" class="px-3 py-1.5 rounded-lg text-blue-400 bg-slate-800 border border-slate-700 flex items-center gap-1.5 shrink-0 font-bold">
+                    <i class="fa-solid fa-boxes-stacked"></i>
+                    <span>Catálogo de SKUs Planilla Aniversario I</span>
+                </button>
+                <button id="nav-checklist" onclick="switchTab('tab-checklist')" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white flex items-center gap-1.5 shrink-0">
+                    <i class="fa-solid fa-square-check text-amber-400"></i>
+                    <span>Checklist Salón & Punteras</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto px-2.5 sm:px-6 py-3 sm:py-5 space-y-4">
+
+        <!-- TAB 1: MASTER PROMOS & SKUS -->
+        <div id="tab-promos" class="space-y-3 sm:space-y-5">
+            
+            <!-- Quick KPI Metrics Grid -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3">
+                <div class="bg-white p-2.5 sm:p-3.5 rounded-xl border border-slate-200/80 shadow-xs flex items-center justify-between">
+                    <div>
+                        <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">SKUs Cargados</p>
+                        <p class="text-lg sm:text-2xl font-black text-slate-800" id="kpi-total">0</p>
+                    </div>
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-barcode text-sm sm:text-lg"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white p-2.5 sm:p-3.5 rounded-xl border border-slate-200/80 shadow-xs flex items-center justify-between">
+                    <div>
+                        <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">Cervezas Andes</p>
+                        <p class="text-lg sm:text-2xl font-black text-amber-600" id="kpi-cervezas">0</p>
+                    </div>
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 bg-amber-50 text-amber-600 rounded-lg flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-beer-mug-empty text-sm sm:text-lg"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white p-2.5 sm:p-3.5 rounded-xl border border-slate-200/80 shadow-xs flex items-center justify-between">
+                    <div>
+                        <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">Topes Definidos</p>
+                        <p class="text-lg sm:text-2xl font-black text-rose-600" id="kpi-topes">0</p>
+                    </div>
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 bg-rose-50 text-rose-600 rounded-lg flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-hand text-sm sm:text-lg"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white p-2.5 sm:p-3.5 rounded-xl border border-slate-200/80 shadow-xs flex items-center justify-between">
+                    <div>
+                        <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">Marcas Registradas</p>
+                        <p class="text-lg sm:text-2xl font-black text-slate-800" id="kpi-brands">0</p>
+                    </div>
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 bg-purple-50 text-purple-600 rounded-lg flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-tags text-sm sm:text-lg"></i>
+                    </div>
+                </div>
+
+                <div class="col-span-2 sm:col-span-1 bg-white p-2.5 sm:p-3.5 rounded-xl border border-slate-200/80 shadow-xs flex items-center justify-between">
+                    <div>
+                        <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">Secciones Activas</p>
+                        <p class="text-lg sm:text-2xl font-black text-blue-600" id="kpi-secciones">0</p>
+                    </div>
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-layer-group text-sm sm:text-lg"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Controls Panel -->
+            <div class="bg-white rounded-xl border border-slate-200/90 shadow-sm p-3 space-y-3">
+                <div class="flex flex-col sm:flex-row gap-2 items-stretch justify-between">
+                    <!-- Search Input -->
+                    <div class="relative flex-1">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs sm:text-sm"></i>
+                        <input type="text" id="searchInput" placeholder="Buscar por EAN, descripción, marca (Ej: 7790895003295, Matarazzo, Oreo, Andes)..." oninput="applyFilters()"
+                            class="w-full pl-9 pr-8 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all">
+                        <button onclick="clearSearch()" id="clearSearchBtn" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1">
+                            <i class="fa-solid fa-xmark text-xs"></i>
+                        </button>
+                    </div>
+
+                    <!-- Actions Bar -->
+                    <div class="flex items-center gap-1.5 self-end sm:self-auto w-full sm:w-auto">
+                        <button onclick="toggleFilterContainer()" class="flex-1 sm:flex-none px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl border border-slate-300 flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-filter text-blue-600"></i>
+                            <span>Filtros Avanzados</span>
+                        </button>
+
+                        <div class="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
+                            <button id="viewCardsBtn" onclick="setViewMode('cards')" class="px-2.5 py-1 text-xs font-bold rounded-lg transition-all bg-white text-slate-900 shadow-xs">
+                                <i class="fa-solid fa-grip"></i> Cards
+                            </button>
+                            <button id="viewTableBtn" onclick="setViewMode('table')" class="px-2.5 py-1 text-xs font-semibold rounded-lg transition-all text-slate-600 hover:text-slate-900">
+                                <i class="fa-solid fa-table"></i> Tabla
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Expandable Filters -->
+                <div id="filterContainer" class="hidden space-y-2 pt-2 border-t border-slate-100">
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 mb-1">Sección</label>
+                            <select id="filterSection" onchange="applyFilters()" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white">
+                                <option value="">Todas las Secciones</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 mb-1">Categoría / Familia</label>
+                            <select id="filterCategoria" onchange="applyFilters()" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white">
+                                <option value="">Todas las Categorías</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 mb-1">Marca</label>
+                            <select id="filterBrand" onchange="applyFilters()" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white">
+                                <option value="">Todas las Marcas</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 mb-1">Mecánica Promocional</label>
+                            <select id="filterMecanica" onchange="applyFilters()" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white">
+                                <option value="">Todas las Mecánicas</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center text-xs text-slate-500 pt-1">
+                        <span>Mostrando <strong id="showing-count" class="text-slate-900">0</strong> de <strong id="total-count" class="text-slate-900">0</strong> SKUs fidedignos</span>
+                        <button onclick="resetFilters()" class="text-rose-600 font-bold hover:underline">
+                            <i class="fa-solid fa-rotate-right"></i> Limpiar Filtros
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div id="emptyState" class="hidden bg-white p-8 rounded-2xl border border-slate-200 text-center space-y-3">
+                <i class="fa-solid fa-box-open text-4xl text-slate-300"></i>
+                <h3 class="text-sm font-bold text-slate-700">No se encontraron productos</h3>
+                <p class="text-xs text-slate-400">Prueba cambiando los criterios de búsqueda o limpiando los filtros.</p>
+                <button onclick="resetFilters()" class="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-bold">Limpiar Filtros</button>
+            </div>
+
+            <!-- Cards View Grid -->
+            <div id="cardsView" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-3">
+                <!-- Dynamic Content Generated by JS -->
+            </div>
+
+            <!-- Table View -->
+            <div id="tableView" class="hidden bg-white rounded-xl border border-slate-200/90 shadow-xs overflow-hidden">
+                <div class="overflow-x-auto max-h-[600px] overflow-y-auto">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead class="bg-slate-900 text-slate-200 uppercase font-bold sticky top-0 z-10 text-[11px]">
+                            <tr>
+                                <th class="p-2.5 border-b border-slate-800 whitespace-nowrap">EAN</th>
+                                <th class="p-2.5 border-b border-slate-800 whitespace-nowrap">Sección / Categoría</th>
+                                <th class="p-2.5 border-b border-slate-800 whitespace-nowrap">Marca</th>
+                                <th class="p-2.5 border-b border-slate-800 whitespace-nowrap min-w-[220px]">Descripción</th>
+                                <th class="p-2.5 border-b border-slate-800 whitespace-nowrap">Mecánica Promo</th>
+                                <th class="p-2.5 border-b border-slate-800 whitespace-nowrap text-right">PVP Normal</th>
+                                <th class="p-2.5 border-b border-slate-800 whitespace-nowrap text-right">PVP Oferta</th>
+                                <th class="p-2.5 border-b border-slate-800 whitespace-nowrap text-center">Tope Máx</th>
+                                <th class="p-2.5 border-b border-slate-800 whitespace-nowrap text-center">Copiar</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody" class="divide-y divide-slate-100 text-slate-700">
+                            <!-- Dynamic Table Rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: CHECKLIST TURNOS & SALON -->
+        <div id="tab-checklist" class="hidden space-y-4">
+            
+            <div class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/90 shadow-sm space-y-3">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
+                        <i class="fa-solid fa-tasks text-blue-600"></i> Control Diario de Cartelería & Punteras Aniversario I
+                    </h2>
+                    <button onclick="resetChecklist()" class="text-xs text-rose-600 font-bold hover:underline">
+                        <i class="fa-solid fa-rotate"></i> Reiniciar Chequeo
+                    </button>
+                </div>
+                <p class="text-xs text-slate-500">
+                    Marca cada ítem a medida que verificas el salón de ventas antes de la apertura o durante el relevamiento de turno.
+                </p>
+
+                <!-- Checklist Items -->
+                <div class="space-y-2 pt-2" id="checklistItemsContainer">
+                    <!-- Populated dynamically by JS -->
+                </div>
+            </div>
+
+            <!-- Limit Rules Reminder -->
+            <div class="bg-amber-50 rounded-2xl p-4 border border-amber-200 text-amber-900 space-y-2">
+                <h3 class="text-xs font-black uppercase tracking-wider flex items-center gap-1.5 text-amber-800">
+                    <i class="fa-solid fa-hand-paper text-amber-600"></i> Topes Destacados de Compra Express (Aniversario I)
+                </h3>
+                <ul class="text-xs space-y-1.5 pl-4 list-disc font-medium text-amber-800/90">
+                    <li><strong>Cervezas Andes Blanca & Negra (1L, Lata 710cc, Lata 473cc, Porrón 340cc):</strong> Máximo 48 unidades por cliente.</li>
+                    <li><strong>Gaseosas Pepsi, 7Up, Paso de los Toros, Mirinda, Schweppes:</strong> Máximo 48 unidades.</li>
+                    <li><strong>Aguas Aquarius, H2OH!, Villa del Sur (Bidón y Pet):</strong> Máximo 24 unidades.</li>
+                    <li><strong>Combo Fernet Branca 750cc + Coca-Cola 2.25L / 2.5L:</strong> $21.200 (Combo Especial).</li>
+                    <li><strong>Golosinas, Alfajores y Chocolates (Arcor, Milka, Oreo, Terrabusi, Topline):</strong> Máximo 8 a 12 unidades.</li>
+                    <li><strong>Higiene, Perfumería y Limpieza (Dove, Gillette, Ayudín, Cif, Ariel):</strong> Máximo 8 unidades.</li>
+                </ul>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- IMPORT DATA MODAL -->
+    <div id="importModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-xs z-50 hidden flex items-center justify-center p-3 sm:p-5 no-print">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl flex flex-col overflow-hidden border border-slate-100">
+            <div class="bg-slate-900 text-white px-4 py-3 flex items-center justify-between border-b border-slate-800">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-file-csv text-emerald-400 text-lg"></i>
+                    <div>
+                        <h3 class="text-sm font-bold">Pegar / Agregar Planilla Adicional</h3>
+                        <p class="text-[11px] text-slate-400">Pega tus filas directo desde Excel o archivo de texto</p>
+                    </div>
+                </div>
+                <button onclick="closeImportModal()" class="text-slate-400 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <div class="p-4 space-y-3">
+                <p class="text-xs text-slate-600">
+                    Puedes pegar filas separadas por tabulaciones o punto y coma (;).
+                    <br><span class="text-[11px] text-slate-400">Formato reconocido: <code>EAN;Seccion;Categoria;Marca;Descripcion;Mecanica;PVP_Normal;PVP_Oferta;Max</code></span>
+                </p>
+                <textarea id="csvImportText" rows="8" placeholder="EAN;Sección;Categoría;Marca;Descripción;Mecánica;PVP Normal;PVP Oferta;Tope&#10;7790070336200;SECO;GALLETITAS;MATARAZZO;FIDEOS PENNE RIGATE MATARAZZO X 500 GRS;PRECIO PRODUCTO;2099;1230;-"
+                    class="w-full p-2.5 text-xs font-mono border border-slate-300 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white"></textarea>
+            </div>
+            <div class="bg-slate-100 px-4 py-2.5 border-t border-slate-200 flex items-center justify-between">
+                <button onclick="clearCustomData()" class="px-3 py-1.5 bg-rose-100 text-rose-700 hover:bg-rose-200 text-xs font-bold rounded-lg">
+                    Restaurar Base Aniversario I
+                </button>
+                <div class="flex gap-2">
+                    <button onclick="closeImportModal()" class="px-3 py-1.5 bg-slate-300 hover:bg-slate-400 text-slate-800 text-xs font-bold rounded-lg">
+                        Cancelar
+                    </button>
+                    <button onclick="processCustomImport()" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg shadow-sm">
+                        Procesar e Importar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div id="toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 sm:left-auto sm:right-5 sm:translate-x-0 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl text-xs flex items-center gap-2 transition-all duration-300 transform translate-y-20 opacity-0 z-50 border border-slate-800">
+        <i class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
+        <span id="toast-msg" class="font-medium">Acción completada</span>
+    </div>
+
+    <script>
+        let masterData = [];
+        let filteredData = [];
+        let currentViewMode = 'cards';
+
+        // EXACT DATASET FROM "INTERNAS EXPRESS - ANIVERSARIO I" (02/10/2026 al 08/10/2026)
+        const exactAniversarioDataset = [
+            // Block 1
+            ["7790895003295", "BEBIDAS", "AGUAS SABORIZADAS", "AQUARIUS", "AQUARIUS", "AGUA SABORIZADA PERA SIN GAS AQUARIUS X 2.25 LT", "2.25 L", "2do 50 Mi CRF", "-", "-", "24 u."],
+            ["7790895003288", "BEBIDAS", "AGUAS SABORIZADAS", "AQUARIUS", "AQUARIUS", "AGUA SABORIZADA POMELO SIN GAS AQUARIUS X 2.25 LT", "2.25 L", "2do 50 Mi CRF", "-", "-", "24 u."],
+            ["7790895003301", "BEBIDAS", "AGUAS SABORIZADAS", "AQUARIUS", "AQUARIUS", "AGUA SABORIZADA MANZANA SIN GAS AQUARIUS X 2.25 LT", "2.25 L", "2do 50 Mi CRF", "-", "-", "24 u."],
+            ["7791813402022", "BEBIDAS", "AGUAS SABORIZADAS", "H2OH!", "H2OH!", "AGUA SABORIZADA LIMON S GAS H2OH X 500 CC", "500 cc", "2do 70 Mi CRF", "-", "-", "24 u."],
+            ["7791813423591", "BEBIDAS", "AGUAS SABORIZADAS", "H2OH!", "H2OH!", "AGUA SABORIZADA CITRUS CON GAS H2OH X 2.25 LT", "2.25 L", "2do 70 Mi CRF", "-", "-", "24 u."],
+            ["7799155000135", "BEBIDAS", "AGUAS NO GASIFICADAS", "VILLA DEL SUR", "VILLA DEL SUR", "AGUA DE MESA S GAS VILLA DEL SUR BIDON X 6.2 LT", "6.2 L", "3x2 Mi CRF", "-", "-", "24 u."],
+            ["7798062547559", "BEBIDAS", "AGUAS NO GASIFICADAS", "VILLA DEL SUR", "VILLA DEL SUR", "AGUA MINERAL SIN GAS VILLA DEL SUR X 2.25 LT", "2.25 L", "3x2 Mi CRF", "-", "-", "24 u."],
+            ["7790315000149", "BEBIDAS", "AGUAS NO GASIFICADAS", "VILLA DEL SUR", "VILLA DEL SUR", "AGUA MINERAL PET S G VILLA DEL SUR X 1.65 LT", "1.65 L", "3x2 Mi CRF", "-", "-", "24 u."],
+            ["7798062540109", "BEBIDAS", "AGUAS NO GASIFICADAS", "VILLA DEL SUR", "VILLA DEL SUR", "AGUA MINERAL PET S G VILLA DEL SUR X 600 CC", "600 cc", "3x2 Mi CRF", "-", "-", "24 u."],
+            ["7792798007813", "BEBIDAS", "CERVEZAS", "ANDES", "ANDES", "CERVEZA BLANCA ANDES BOTELLA RET X 1LT", "1 L", "2do 50 Mi CRF", "-", "-", "48 u."],
+            ["7792798015429", "BEBIDAS", "CERVEZAS", "ANDES", "ANDES", "CERVEZA BLANCA ANDES LATA X 710 CC", "710 cc", "2do 50 Mi CRF", "-", "-", "48 u."],
+            ["7792798002252", "BEBIDAS", "CERVEZAS", "ANDES", "ANDES", "CERVEZA BLANCA ANDES LATA 6 X 473 CC", "Pack 6x473", "2do 50 Mi CRF", "-", "-", "48 u."],
+            ["7792798002245", "BEBIDAS", "CERVEZAS", "ANDES", "ANDES", "CERVEZA BLANCA ANDES LATA X 473 CC", "473 cc", "2do 50 Mi CRF", "-", "-", "48 u."],
+            ["7792798002160", "BEBIDAS", "CERVEZAS", "ANDES", "ANDES", "CERVEZA NEGRA ANDES ORIGEN PORRON X 340 CC", "340 cc", "2do 50 Mi CRF", "-", "-", "48 u."],
+            ["7791813434412", "BEBIDAS", "GASEOSAS", "7 UP", "7UP LIGHT", "GASEOSA LIMA LIMON S AZUCAR 7UP N PET X 1.5 LT", "1.5 L", "20% Dto Mi CRF", "-", "-", "48 u."],
+            ["7791813777403", "BEBIDAS", "GASEOSAS", "7 UP", "7 UP", "GASEOSA LIMA LIMON REGULAR NF 7 UP PET X 2LT", "2 L", "20% Dto Mi CRF", "-", "-", "48 u."],
+            ["7791813434368", "BEBIDAS", "GASEOSAS", "7 UP", "7UP LIGHT", "GASEOSA LIMA LIMON S AZUCAR 7 UP N PET X 500 CC", "500 cc", "3x2 Mi CRF", "-", "-", "48 u."],
+            ["7791813777021", "BEBIDAS", "GASEOSAS", "7 UP", "7 UP", "GASEOSA LIMA LIMON REGULAR 7 UP LATA X 354 CC", "354 cc", "3x2 Mi CRF", "-", "-", "48 u."],
+            ["7791813423157", "BEBIDAS", "GASEOSAS", "MIRINDA", "MIRINDA", "GASEOSA NARANJA REGULAR MIRINDA PET X 2.25 LT", "2.25 L", "20% Dto Mi CRF", "-", "-", "48 u."],
+            ["7791813421368", "BEBIDAS", "GASEOSAS", "PASO DE LOS TOROS", "PASO DE LOS TOROS", "GASEOSA TONICA REG PASO DE LOS TOROS PET X 1.5 LT", "1.5 L", "20% Dto Mi CRF", "-", "-", "48 u."],
+            ["7791813422389", "BEBIDAS", "GASEOSAS", "PASO DE LOS TOROS", "PASO DE LOS TOROS", "GASEOSA POMELO REG PASO DE LOS TOROS X 2 LT", "2 L", "20% Dto Mi CRF", "-", "-", "48 u."],
+            ["7791813420385", "BEBIDAS", "GASEOSAS", "PASO DE LOS TOROS", "PASO DE LOS TOROS", "GASEOSA POMELO REGULAR PASO DE LOS TOROS PET X 500 CC", "500 cc", "3x2 Mi CRF", "-", "-", "48 u."],
+            ["7791813800774", "BEBIDAS", "GASEOSAS", "PASO DE LOS TOROS", "PASO DE LOS TOROS", "GASEOSA TONICA REG PASO DE LOS TOROS LATA X 269 CC", "269 cc", "3x2 Mi CRF", "-", "-", "48 u."],
+            ["7791813828419", "BEBIDAS", "GASEOSAS", "PEPSI", "PEPSI LIGHT", "GASEOSA COLA BLACK PEPSI NF PET X 1.5 LT", "1.5 L", "20% Dto Mi CRF", "-", "-", "48 u."],
+            ["7791813888413", "BEBIDAS", "GASEOSAS", "PEPSI", "PEPSI", "GASEOSA COLA REGULAR PEPSI N PET X 1.5 LT", "1.5 L", "20% Dto Mi CRF", "-", "-", "48 u."],
+            ["7791813888376", "BEBIDAS", "GASEOSAS", "PEPSI", "PEPSI", "GASEOSA COLA REGULAR PEPSI N LATA X 354 CC", "354 cc", "3x2 Mi CRF", "-", "-", "48 u."],
+            ["7791813888406", "BEBIDAS", "GASEOSAS", "PEPSI", "PEPSI", "GASEOSA COLA REG N PEPSI PET X 500 CC", "500 cc", "3x2 Mi CRF", "-", "-", "48 u."],
+            ["7791813828365", "BEBIDAS", "GASEOSAS", "PEPSI", "PEPSI LIGHT", "GASEOSA COLA BLACK PEPSI N PET X 500 CC", "500 cc", "3x2 Mi CRF", "-", "-", "48 u."],
+            ["7791813828372", "BEBIDAS", "GASEOSAS", "PEPSI", "PEPSI LIGHT", "GASEOSA COLA BLACK PEPSI N LATA X 354 CC", "354 cc", "3x2 Mi CRF", "-", "-", "48 u."],
+            ["7790895010095", "BEBIDAS", "GASEOSAS", "SCHWEPPES", "SCHWEPPES ZERO", "GASEOSA POMELO ZERO SCHWEPPES PET X 2.25 LT", "2.25 L", "2do 50 Mi CRF", "-", "-", "48 u."],
+            ["7792170110575", "BEBIDAS", "JUGOS", "GATORADE", "GATORADE", "ISOTONICA MANZANA GATORADE PET X 1.25 LT", "1.25 L", "20% Dto Mi CRF", "-", "-", "24 u."],
+            ["7792170110704", "BEBIDAS", "JUGOS", "GATORADE", "GATORADE", "ISOTONICA COOL BLUE GATORADE PET X 1.25 LT", "1.25 L", "20% Dto Mi CRF", "-", "-", "24 u."],
+            ["7792170110568", "BEBIDAS", "JUGOS", "GATORADE", "GATORADE", "ISOTONICA FRUTAS TROPICALES GATORADE PET X 1.25 LT", "1.25 L", "20% Dto Mi CRF", "-", "-", "24 u."],
+            ["7792170042005", "BEBIDAS", "JUGOS", "GATORADE", "GATORADE", "ISOTONICA MANZANA GATORADE PET X 500 CC", "500 cc", "20% Dto Mi CRF", "-", "-", "24 u."],
+            ["7792170042258", "BEBIDAS", "JUGOS", "GATORADE", "GATORADE", "ISOTONICA COOL BLUE GATORADE PET X 500 CC", "500 cc", "20% Dto Mi CRF", "-", "-", "24 u."],
+            ["7792170042012", "BEBIDAS", "JUGOS", "GATORADE", "GATORADE", "ISOTONICA NARANJA GATORADE PET X 500 CC", "500 cc", "20% Dto Mi CRF", "-", "-", "24 u."],
+            ["7790895006104", "BEBIDAS", "JUGOS", "POWERADE", "POWERADE", "ISOTONICA FRUTAS TROPICALES POWERADE PET X 995 CC", "995 cc", "2do 70 Mi CRF", "-", "-", "24 u."],
+            ["7790895641183", "BEBIDAS", "JUGOS", "POWERADE", "POWERADE", "ISOTONICA FRUTAS TROPICALES POWERADE PET X 500 CC", "500 cc", "2do 70 Mi CRF", "-", "-", "24 u."],
+            ["7790895640025", "BEBIDAS", "JUGOS", "POWERADE", "POWERADE", "ISOTONICA MOUNTAIN BLAST POWERADE PET X 500CC", "500 cc", "2do 70 Mi CRF", "-", "-", "24 u."],
+            ["7790895640018", "BEBIDAS", "JUGOS", "POWERADE", "POWERADE", "ISOTONICA MANZANA POWERADE PET X 500 CC", "500 cc", "2do 70 Mi CRF", "-", "-", "24 u."],
+            ["9002490100070", "BEBIDAS", "JUGOS", "RED BULL", "RED BULL", "BEBIDA ENERGIZANTE RED BULL LATA X 250 CC", "250 cc", "15% Dto Mi CRF", "-", "-", "24 u."],
+            ["90435225", "BEBIDAS", "JUGOS", "RED BULL", "RED BULL", "BEBIDA ENERGIZANTE RED BULL LATA X 355 CC", "355 cc", "15% Dto Mi CRF", "-", "-", "24 u."],
+            ["90415418", "BEBIDAS", "JUGOS", "RED BULL", "RED BULL", "BEBIDA ENERGIZANTE SUGAR FREE RED BULL LATA 250 CC", "250 cc", "15% Dto Mi CRF", "-", "-", "24 u."],
+            ["9002490288341", "BEBIDAS", "JUGOS", "RED BULL", "RED BULL", "BEBIDA ENERGIZANTE SUMMER POMELO RED BULL LATA 250 CC", "250 cc", "15% Dto Mi CRF", "-", "-", "24 u."],
+            ["7791813111214", "BEBIDAS", "JUGOS", "ROCKSTAR", "ROCKSTAR", "BEBIDA ENERGIZANTE ROCKSTAR BOT X 500 CC", "500 cc", "2do 50 Mi CRF", "-", "-", "24 u."],
+            ["7702018072392", "D.P.H.", "COSMETICA", "GILLETTE", "SIMPLY VENUS", "MAQUINA DESECHABLE MUJER VENUS ROSA GILLETTE X 2 UNI", "2 u.", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7791293047102", "D.P.H.", "CUIDADO DEL CABELLO", "DOVE", "DOVE", "SHAMPOO RECONSTRUCCION + AMINO DOVE X 400 CC", "400 cc", "2do 80 Mi CRF", "-", "-", "8 u."],
+            ["7791293047171", "D.P.H.", "CUIDADO DEL CABELLO", "DOVE", "DOVE", "SHAMPOO REGENERACION + RETINOL DOVE X 400 CC", "400 cc", "2do 80 Mi CRF", "-", "-", "8 u."],
+            ["7791293047522", "D.P.H.", "CUIDADO DEL CABELLO", "DOVE", "DOVE", "ACONDICIONADOR REGENERACION + RETINOL DOVE X 400CC", "400 cc", "2do 80 Mi CRF", "-", "-", "8 u."],
+            ["7791293047515", "D.P.H.", "CUIDADO DEL CABELLO", "DOVE", "DOVE", "ACONDICIONADOR OLEO NUTRICION DOVE X 400 CC", "400 cc", "2do 80 Mi CRF", "-", "-", "8 u."],
+            ["7790033342125", "D.P.H.", "CUIDADO DEL CABELLO", "ELVIVE", "ELVIVE", "ACONDICIONADOR COLAGENO LIFTER ELVIVE X 400 CC", "400 cc", "2do 80 Mi CRF", "-", "-", "8 u."],
+            ["7790033342095", "D.P.H.", "CUIDADO DEL CABELLO", "ELVIVE", "ELVIVE", "SHAMPOO COLAGENO LIFTER ELVIVE X 400 CC", "400 cc", "2do 80 Mi CRF", "-", "-", "8 u."],
+            ["7790010002806", "D.P.H.", "HIGIENE FEMENINA", "CAREFREE", "CAREFREE", "PROTECTORES PROTECCION LARGOS CAREFREE X 60 UNI", "60 u.", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7794626014949", "D.P.H.", "HIGIENE FEMENINA", "KOTEX", "KOTEX", "TOALLA FEMENINA KOTEX ESENCIAL X 16 UNI", "16 u.", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7794626010842", "D.P.H.", "HIGIENE FEMENINA", "PLENITUD", "PLENITUD FEMME", "PROTECTORES LEVE ANTIBAC INCON LARGO PLENITUD X 14U", "14 u.", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7790010002653", "D.P.H.", "HIGIENE FEMENINA", "SIEMPRE LIBRE", "SIEMPRE LIBRE", "TOALLA FEM ADAPT SIEMPRE LIBRE ESPECIAL X 8 UNI", "8 u.", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7790010002769", "D.P.H.", "HIGIENE FEMENINA", "SIEMPRE LIBRE", "SIEMPRE LIBRE", "TOALLA FEM ULTRAFINA SIEMPRE LIBRE ESPECIAL X 8UNI", "8 u.", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7793253006709", "D.P.H.", "LIMPIEZA Y CASA", "AYUDIN", "AYUDIN", "LAVANDINA ORIGINAL DESINFECTANTE AYUDIN X 2 LT", "2 L", "35% Dto Mi CRF", "-", "-", "8 u."],
+            ["7793253003722", "D.P.H.", "LIMPIEZA Y CASA", "AYUDIN", "AYUDIN TRIPLE PODER", "LAVANDINA MULTISUP LAVANDA TRIPLE PODER AYUDIN X 2L", "2 L", "35% Dto Mi CRF", "-", "-", "8 u."],
+            ["7791290794061", "D.P.H.", "LIMPIEZA Y CASA", "CIF", "BIOACTIVE", "DETERGENTE BIOACTIVE LIMON CIF X 500 CC", "500 cc", "2do 80 Mi CRF", "-", "-", "8 u."],
+            ["7791290794115", "D.P.H.", "LIMPIEZA Y CASA", "CIF", "BIOACTIVE", "DETERGENTE BIOACTIVE LIMA CIF X 500 CC", "500 cc", "2do 80 Mi CRF", "-", "-", "8 u."],
+            ["7791290794085", "D.P.H.", "LIMPIEZA Y CASA", "CIF", "BIOACTIVE", "DETERGENTE BIOACTIVE LIMON CIF REPUESTO X 450 CC", "450 cc", "2do 80 Mi CRF", "-", "-", "8 u."],
+            ["7791290794054", "D.P.H.", "LIMPIEZA Y CASA", "CIF", "BIOACTIVE", "DETERGENTE BIOACTIVE LIMON CIF X 300 CC", "300 cc", "2do 80 Mi CRF", "-", "-", "8 u."],
+            ["7790520998927", "D.P.H.", "LIMPIEZA Y CASA", "MR MUSCULO", "MR MUSCULO", "LIMPIADOR P HORNOS MR MUSCULO AEROSOL X 360 CC", "360 cc", "35% Dto Mi CRF", "-", "-", "8 u."],
+            ["7791290796102", "D.P.H.", "LIMPIEZA Y CASA", "VIM", "VIM", "CANASTA P INODORO PODER X 6 CITRUS VIM X 50 GRS", "50 g", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7790990002834", "D.P.H.", "LIMPIEZA Y CASA", "ARIEL", "ARIEL", "JABON LIQ DILUIBLE ARIEL BOT X 500 CC", "500 cc", "35% Dto Mi CRF", "-", "-", "8 u."],
+            ["7509546702605", "D.P.H.", "TOCADOR", "COLGATE", "COLGATE TOTAL 12", "CREMA DENTAL ORIG MINT COLGATE TOTAL 12 X 90 GRM", "90 g", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7506306241183", "D.P.H.", "TOCADOR", "DOVE", "DOVE", "ANTITRANSPIRANTE AERO ORIGINAL DOVE X 150 CC", "150 cc", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7891150081239", "D.P.H.", "TOCADOR", "DOVE", "DOVE", "ANTITRANSPIRANTE AERO MUJER ORIGINAL DOVE X 250 CC", "250 cc", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["78924468", "D.P.H.", "TOCADOR", "DOVE", "DOVE", "ANTITRANSPIRANTE ROLL ON ORIGINAL DOVE X 50 CC", "50 cc", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7506306241176", "D.P.H.", "TOCADOR", "DOVE", "DOVE", "ANTITRANSPIRANTE AERO INVISIBLE DRY DOVE X 150 CC", "150 cc", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7702018874729", "D.P.H.", "TOCADOR", "GILLETTE", "PRESTOBARBA 3", "MAQUINA DE AFEITAR PRESTOBARBA3 GILLETTE X 2 UNI", "2 u.", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7791293050805", "D.P.H.", "TOCADOR", "LUX", "LUX", "JABON DE TOCADOR JAZMIN CREMOSO LUX 3 X 120 GRS", "360 g", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7791293050836", "D.P.H.", "TOCADOR", "LUX", "LUX", "JABON DE TOCADOR ROSAS FRANCESAS LUX 3X120 GRS", "360 g", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7791293049427", "D.P.H.", "TOCADOR", "SUAVE", "SUAVE", "JABON LIQUIDO REP PEPINO ALOE SUAVE X 220CC", "220 cc", "35% Dto Mi CRF", "-", "-", "8 u."],
+            ["7797906054826", "P.A.S.", "FRESCOS Y CONGELADOS", "MC CAIN", "CLASICAS MC CAIN", "PAPAS BASTON TRADICIONAL MC CAIN X 700 GRS", "700 g", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7791337007819", "P.A.S.", "LACTEOS", "ACTIMEL", "ACTIMEL", "LECHE FERMENTADA MULTIFRUTA ACTIMEL X 100 CC", "100 cc", "2do 70 Mi CRF", "-", "-", "24 u."],
+            ["7791337009400", "P.A.S.", "LACTEOS", "ACTIVIA", "ACTIVIA", "BEBIBLE YOGUR CIRUELA ACTIVIA SOBRE X 900 GRS", "900 g", "2do 70 Mi CRF", "-", "-", "24 u."],
+            ["7791337008694", "P.A.S.", "LACTEOS", "DANONINO", "DANONINO", "YOGUR BEBIBLE FRUTILLA DANONINO X185 GRS", "185 g", "2do 70 Mi CRF", "-", "-", "24 u."],
+            ["7791337008670", "P.A.S.", "LACTEOS", "DANONINO", "DANONINO", "YOGUR BEBIBLE FRUTILLA DANONINO BOTELLA X 100 CC", "100 cc", "2do 70 Mi CRF", "-", "-", "24 u."],
+            ["7791337008656", "P.A.S.", "LACTEOS", "DANONINO", "DANONINO", "YOGUR VAINILLA DANONINO POTE X 80.5 GRS", "80.5 g", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7791337008663", "P.A.S.", "LACTEOS", "DANONINO", "DANONINO", "YOGUR FRUTILLA DANONINO POTE X 80.5 GRS", "80.5 g", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7793940054006", "P.A.S.", "LACTEOS", "LA SERENISIMA", "LA SERENISIMA", "MANTECA EXTRA LA SERENISIMA X 200 GRS", "200 g", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7793940052002", "P.A.S.", "LACTEOS", "LA SERENISIMA", "LA SERENISIMA", "MANTECA EXTRA LA SERENISIMA X 100 GRS", "100 g", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7791337009844", "P.A.S.", "LACTEOS", "LA SERENISIMA", "LA SERENISIMA", "QUESO CREMA CLASICO LA SERENISIMA POTE X 460 GRS", "460 g", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7791337009851", "P.A.S.", "LACTEOS", "LA SERENISIMA", "LA SERENISIMA", "QUESO CREMA LIGHT LA SERENISIMA POTE X 460 GRS", "460 g", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7791337010444", "P.A.S.", "LACTEOS", "LA SERENISIMA", "LA SERENISIMA", "YOGUR BATIDO C CEREALES LA SERENISIMA X 159 GR", "159 g", "2do 70 Mi CRF", "-", "-", "24 u."],
+            ["7791337010321", "P.A.S.", "LACTEOS", "LA SERENISIMA", "LA SERENISIMA", "YOGUR DESC FIRME VAINILLA LA SERENISIMA POTE X190G", "190 g", "2do 70 Mi CRF", "-", "-", "24 u."],
+            ["7791337010192", "P.A.S.", "LACTEOS", "LA SERENISIMA", "LA SERENISIMA", "YOGUR ENT FIRM VAINILLA LA SERENISIMA POTE X190 GR", "190 g", "2do 70 Mi CRF", "-", "-", "24 u."],
+            ["7791337010215", "P.A.S.", "LACTEOS", "LA SERENISIMA", "LA SERENISIMA", "YOGUR BEBIB FRUTILLA LA SERENISIMA SACHET X 900 GR", "900 g", "2do 70 Mi CRF", "-", "-", "24 u."],
+            ["7791337010451", "P.A.S.", "LACTEOS", "LA SERENISIMA", "LA SERENISIMA", "YOGUR ENTERO C ROCKLETS LA SERENISIMA POTE X164 GR", "164 g", "2do 70 Mi CRF", "-", "-", "24 u."],
+            ["7791337010475", "P.A.S.", "LACTEOS", "LA SERENISIMA", "LA SERENISIMA", "YOGUR BEBIB DESC FRU LA SERENISIMA SACHET X 900 CC", "900 cc", "2do 70 Mi CRF", "-", "-", "24 u."],
+            ["7791337010468", "P.A.S.", "LACTEOS", "LA SERENISIMA", "LA SERENISIMA", "YOGUR BEBIB DESC VAI LA SERENISIMA SACHET X 900 CC", "900 cc", "2do 70 Mi CRF", "-", "-", "24 u."],
+            ["7791337010185", "P.A.S.", "LACTEOS", "LA SERENISIMA", "LA SERENISIMA", "YOGUR ENT FIRM FRUTILLA LA SERENISIMA POTE X190 GR", "190 g", "2do 70 Mi CRF", "-", "-", "24 u."],
+            ["7791337010291", "P.A.S.", "LACTEOS", "LA SERENISIMA", "LA SERENISIMA", "YOGUR DESC BATIDO CON CEREAL LA SERENISIMA X 157GR", "157 g", "2do 70 Mi CRF", "-", "-", "24 u."],
+            ["7791337010338", "P.A.S.", "LACTEOS", "LA SERENISIMA", "LA SERENISIMA", "YOGUR DESC FIRME FRUTILLA LA SERENISIMA POTE X190G", "190 g", "2do 70 Mi CRF", "-", "-", "24 u."],
+            ["7791337010437", "P.A.S.", "LACTEOS", "LA SERENISIMA", "LA SERENISIMA", "YOGUR ENT BATIDO DURAZNO LA SERENISIMA X 120GRS", "120 g", "2do 70 Mi CRF", "-", "-", "24 u."],
+            ["7791337010314", "P.A.S.", "LACTEOS", "LA SERENISIMA", "LA SERENISIMA", "YOGUR DESC CREMOSO FRUTILLA LA SERENISIMA X 120GR", "120 g", "2do 70 Mi CRF", "-", "-", "24 u."],
+            ["7791337010413", "P.A.S.", "LACTEOS", "LA SERENISIMA", "LA SERENISIMA", "YOGUR ENT FIRME FRUTILLA LA SERENISIMA X 120GRS", "120 g", "2do 70 Mi CRF", "-", "-", "24 u."],
+            ["7791337010307", "P.A.S.", "LACTEOS", "LA SERENISIMA", "LA SERENISIMA", "YOGUR DESC CREMOSO VAINILLA LA SERENISIMA X 120GRS", "120 g", "2do 70 Mi CRF", "-", "-", "24 u."],
+            ["7791337010420", "P.A.S.", "LACTEOS", "LA SERENISIMA", "LA SERENISIMA", "YOGUR ENT FIRME VAINILLA LA SERENISIMA X 120GRS", "120 g", "2do 70 Mi CRF", "-", "-", "24 u."],
+            ["7791337010482", "P.A.S.", "LACTEOS", "LA SERENISIMA", "LA SERENISIMA", "YOGUR BEB DESLAC VAINI LA SERENISIMA SACHET X 900G", "900 g", "2do 70 Mi CRF", "-", "-", "24 u."],
+            ["7791337010499", "P.A.S.", "LACTEOS", "LA SERENISIMA", "LA SERENISIMA", "YOGUR BEB DESLAC FRUTI LA SERENISIMA SACHET X 900G", "900 g", "2do 70 Mi CRF", "-", "-", "24 u."],
+            ["7791337010369", "P.A.S.", "LACTEOS", "LA SERENISIMA", "LA SERENISIMA", "YOGUR BEBIB VAINILLA LA SERENISIMA SACHET X 900 GR", "900 g", "2do 70 Mi CRF", "-", "-", "24 u."],
+            ["7791337010260", "P.A.S.", "LACTEOS", "LA SERENISIMA", "LA SERENISIMA", "YOGUR ENT CREMOSO FRUTI LA SERENISIMA POTE X 120GR", "120 g", "2do 70 Mi CRF", "-", "-", "24 u."],
+            ["7790742373304", "P.A.S.", "QUESOS", "LA SERENISIMA", "FINLANDIA", "QUESO FUNDIDO FINLANDIA LIGHT POTE 290 GRS", "290 g", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7790742373205", "P.A.S.", "QUESOS", "LA SERENISIMA", "FINLANDIA", "QUESO FUNDIDO FINLANDIA POTE 290 GRS", "290 g", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7790742321800", "P.A.S.", "QUESOS", "LA SERENISIMA", "FINLANDIA", "QUESO FUNDIDO LIGHT FINLANDIA POTE X 180 GRS", "180 g", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7790742324108", "P.A.S.", "QUESOS", "LA SERENISIMA", "FINLANDIA", "QUESO LA SERENISIMA FINLANDIA POTE 290 GRS", "290 g", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7790742321701", "P.A.S.", "QUESOS", "LA SERENISIMA", "FINLANDIA", "QUESO FUNDIDO FINLANDIA POTE X 180 GRS", "180 g", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7794000008557", "SECO", "CALDOS Y SOPAS", "KNORR", "KNORR", "CALDO VERDURA CUBOS KNORR X 12 UNI", "114 g", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7794000008540", "SECO", "CALDOS Y SOPAS", "KNORR", "KNORR", "CALDO GALLINA CUBOS KNORR X 12 UNI", "114 g", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7794000005822", "SECO", "CALDOS Y SOPAS", "KNORR", "KNORR", "SOPA CASERA POLLO C CAB ANGEL KNORR X 105.6 GRS", "105.6 g", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7794000005884", "SECO", "CALDOS Y SOPAS", "KNORR", "KNORR", "SOPA CREMA ZAPALLO KNORR X 70 GRS", "70 g", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7794000006898", "SECO", "CALDOS Y SOPAS", "KNORR", "KNORR", "SOPA LIGHT ZAPALLO QUICK BALANCE KNORR X 5 UNI", "46.5 g", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7794000006911", "SECO", "CALDOS Y SOPAS", "KNORR", "KNORR", "SOPA ZAPALLO QUICK KNORR X 5 UNI", "63 g", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7790490998309", "SECO", "ENDULZANTES", "HILERET", "HILERET", "EDULCORANTE LIQUIDO C SACARINA HILERET PET X 500CC", "500 cc", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7794940000796", "SECO", "ENDULZANTES", "HILERET", "HILERET", "EDULCORANTE LIQUIDO C STEVIA HILERET PET X 200 CC", "200 cc", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7790490998231", "SECO", "ENDULZANTES", "HILERET", "HILERET", "EDULCORANTE LIQUIDO C SACARINA HILERET PET X 250CC", "250 cc", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7622300742645", "SECO", "GALLETITAS", "DUQUESA", "DUQUESA", "GALLETITAS VAINILLA RELL LIMON DUQUESA X 115 GRS", "115 g", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7790070418425", "SECO", "GALLETITAS", "GALLO SNACKS", "GALLO SNACKS", "BIZCOCHOS ARROZ DULCE GALLO BOLSA X 100 GRS", "100 g", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7790070418463", "SECO", "GALLETITAS", "GALLO SNACKS", "GALLO SNACKS", "BIZCOCHOS ARROZ SALADOS GALLO X 100 GRS", "100 g", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7622201735258", "SECO", "GALLETITAS", "OREO", "OREO", "GALLETITAS CHOCOLATE RELL VAINILLA OREO 3 X 118GRS", "354 g", "2do 80 Mi CRF", "-", "-", "8 u."],
+            ["7622201735296", "SECO", "GALLETITAS", "OREO", "OREO", "GALLETITAS CHOCOLATE RELL VAINILLA OREO X 118 GRS", "118 g", "2do 80 Mi CRF", "-", "-", "8 u."],
+            ["7622201735821", "SECO", "GALLETITAS", "OREO", "OREO", "GALLETITAS CHOCOLATE RELL VAINILLA OREO X 182.5 GR", "182.5 g", "2do 80 Mi CRF", "-", "-", "8 u."],
+            ["7622202038099", "SECO", "GALLETITAS", "OREO", "OREO", "GALLETITAS SIN TACC OREO X 95 GRS", "95 g", "2do 80 Mi CRF", "-", "-", "8 u."],
+            ["7622202049033", "SECO", "GALLETITAS", "OREO", "OREO", "GALLETITAS CHOCOLATE RELL CHOCO OREO X 118 GRS", "118 g", "2do 80 Mi CRF", "-", "-", "8 u."],
+            ["7622201806552", "SECO", "GALLETITAS", "OREO", "OREO", "GALLETITAS VAINILLA RELL VAINILLA OREO X 118 GRS", "118 g", "2do 80 Mi CRF", "-", "-", "8 u."],
+            ["7790380023432", "SECO", "GALLETITAS", "TODDY", "TODDY", "GALLETITAS C CHIPS CHOCOLATE TODDY X 126 GRS", "126 g", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7790040143937", "SECO", "GALLETITAS", "TRAVIATA", "TRAVIATA REX", "GALLETITAS CRACKERS TRAVIATA+REX ORIG X 96 GRS", "96 g", "2x1 Mi CRF", "-", "-", "8 u."],
+            ["7790580131371", "SECO", "GOLOSINAS", "ARCOR", "ARCOR", "BOMBONES SURTIDOS KIOSKO ARCOR CAJA X 246 GRS", "246 g", "2do 70 Mi CRF", "-", "-", "12 u."],
+            ["7790580401504", "SECO", "GOLOSINAS", "ARCOR", "ARCOR", "TURRON OBLEA MANI ARCOR 10 X 25 GRS", "250 g", "2do 70 Mi CRF", "-", "-", "12 u."],
+            ["7790580119126", "SECO", "GOLOSINAS", "BON O BON", "BON O BON", "BOMBONES SURTIDO BON O BON CAJA X255G", "255 g", "2do 70 Mi CRF", "-", "-", "12 u."],
+            ["7622201818654", "SECO", "GOLOSINAS", "CADBURY", "CADBURY", "TABLETA DE CHOCOLATE CON YOGUR CADBURY X 29 GRS", "29 g", "2do 80 Mi CRF", "-", "-", "12 u."],
+            ["7622201818579", "SECO", "GOLOSINAS", "CADBURY", "CADBURY", "TABLETA DE CHOCOLATE 3 SUENOS CADBURY X 25 GRS", "25 g", "2do 80 Mi CRF", "-", "-", "12 u."],
+            ["7622201818692", "SECO", "GOLOSINAS", "CADBURY", "CADBURY", "TABLETA DE CHOCOLATE CON YOGUR CADBURY X 162 GRS", "162 g", "2do 80 Mi CRF", "-", "-", "12 u."],
+            ["77965370", "SECO", "GOLOSINAS", "CEREAL MIX", "CEREAL MIX", "BARRA CEREAL LIGHT YOGHU FRUT CEREAL MIX X 26G", "26 g", "2do 70 Mi CRF", "-", "-", "12 u."],
+            ["77922120", "SECO", "GOLOSINAS", "COFLER", "COFLER", "BARRA CHOCOLATE C LECHE MANI COFLER BLOCK X 110 GR", "110 g", "2do 70 Mi CRF", "-", "-", "12 u."],
+            ["7790580103743", "SECO", "GOLOSINAS", "COFLER", "COFLER", "TABLETA CHOC C MANI COFLER BLOCK FLOW X 300 GRS", "300 g", "2do 70 Mi CRF", "-", "-", "12 u."],
+            ["78909434", "SECO", "GOLOSINAS", "FERRERO ROCHER", "FERRERO ROCHER", "BOMBON RELLENO FERRERO ROCHER X 3 UNI", "37 g", "2do 70 Mi CRF", "-", "-", "12 u."],
+            ["7622202247286", "SECO", "GOLOSINAS", "HALLS", "HALLS", "CARAMELO CHERRY HALLS X 25.2 GRS", "25.2 g", "2do 70 Mi CRF", "-", "-", "12 u."],
+            ["7622202271267", "SECO", "GOLOSINAS", "HALLS", "HALLS", "CARAMELOS XTRA STRONG HALLS X 25 GRS", "24.75 g", "2do 70 Mi CRF", "-", "-", "12 u."],
+            ["7622202271298", "SECO", "GOLOSINAS", "HALLS", "HALLS", "CARAMELOS MIEL C MENTA HALLS X 26 GRS", "25.65 g", "2do 70 Mi CRF", "-", "-", "12 u."],
+            ["7622202247392", "SECO", "GOLOSINAS", "HALLS", "HALLS", "CARAMELO MENTHOL HALLS X 25.2 GRS", "25.2 g", "2do 70 Mi CRF", "-", "-", "12 u."],
+            ["80052760", "SECO", "GOLOSINAS", "KINDER", "KINDER", "OBLEAS RELLENAS C AVELLANAS KINDER BUENO X 43 GRS", "43 g", "2do 50 Mi CRF", "-", "-", "12 u."],
+            ["77949677", "SECO", "GOLOSINAS", "KINDER", "KINDER", "BARRA DE CHOCOLATE MIXTO KINDER X 4 UNI", "50 g", "2do 50 Mi CRF", "-", "-", "12 u."],
+            ["77958648", "SECO", "GOLOSINAS", "MENTHOPLUS", "MENTHOPLUS", "CARAMELOS STRONG MENTHOPLUS X 29.4 GRS", "29.4 g", "2do 70 Mi CRF", "-", "-", "12 u."],
+            ["77958662", "SECO", "GOLOSINAS", "MENTHOPLUS", "MENTHOPLUS", "CARAMELOS MENTA MENTHOPLUS X 29.4 GRS", "29.4 g", "2do 70 Mi CRF", "-", "-", "12 u."],
+            ["77958624", "SECO", "GOLOSINAS", "MENTHOPLUS", "MENTHOPLUS", "CARAMELOS MENTHOL MENTHOPLUS X 29.4 GRS", "29.4 g", "2do 70 Mi CRF", "-", "-", "12 u."],
+            ["7622300457303", "SECO", "GOLOSINAS", "MILKA", "MILKA", "ALFAJOR CHOC BCO TRIPLE C MOUSSE MILKA X 55 G", "55 g", "2do 70 Mi CRF", "-", "-", "12 u."],
+            ["7622300759506", "SECO", "GOLOSINAS", "MILKA", "MILKA", "ALFAJOR MOUSSE MILKA X 42 GRS", "42 g", "2do 70 Mi CRF", "-", "-", "12 u."],
+            ["7622201492465", "SECO", "GOLOSINAS", "MILKA", "MILKA", "TABLETA CHOCO RELLENA MILKA CHOCOPAUSE X 45 GRS", "45 g", "2do 80 Mi CRF", "-", "-", "12 u."],
+            ["7622202322129", "SECO", "GOLOSINAS", "MILKA", "MILKA", "TABLETA CHOCOLATE BCO Y DDL MILKA X 29 GRS", "29 g", "2do 80 Mi CRF", "-", "-", "12 u."],
+            ["7622210795908", "SECO", "GOLOSINAS", "MILKA", "MILKA", "TABLETA CHOCOLATE BLANCO MILKA OREO X 20 GRS", "20 g", "2do 80 Mi CRF", "-", "-", "12 u."],
+            ["7622202328947", "SECO", "GOLOSINAS", "MILKA", "MILKA", "TABLETA DE CHOCOLATE M JOY MILKA X 55 GRS", "55 g", "2do 80 Mi CRF", "-", "-", "12 u."],
+            ["7622210745620", "SECO", "GOLOSINAS", "MILKA", "MILKA", "TABLETA DE CHOCOLATE C ALMEN M JOY MILKA X 55 GRS", "55 g", "2do 80 Mi CRF", "-", "-", "12 u."],
+            ["7622202322068", "SECO", "GOLOSINAS", "MILKA", "MILKA", "TABLETA CHOCOLATE Y DDL MILKA X 29 GRS", "29 g", "2do 80 Mi CRF", "-", "-", "12 u."],
+            ["7622210795625", "SECO", "GOLOSINAS", "MILKA", "MILKA", "TABLETA CHOCOLATE CON LECHE MILKA X 20 GRS", "20 g", "2do 80 Mi CRF", "-", "-", "12 u."],
+            ["7622201812744", "SECO", "GOLOSINAS", "MILKA", "MILKA", "TABLETA DE CHOCOLATE AIREADO MILKA X 110 GRS", "110 g", "2do 80 Mi CRF", "-", "-", "12 u."],
+            ["7622201818951", "SECO", "GOLOSINAS", "MILKA", "MILKA", "TABLETA DE CHOC COMBINADO AIREADO MILKA X 50 GRS", "50 g", "2do 80 Mi CRF", "-", "-", "12 u."],
+            ["7790580129330", "SECO", "GOLOSINAS", "MOGUL", "MOGUL", "GOMAS FRUTALES OSO MOGUL EXTREME X 50 GRS", "50 g", "2do 70 Mi CRF", "-", "-", "12 u."],
+            ["7790580146825", "SECO", "GOLOSINAS", "MOGUL", "MOGUL", "GOMITAS TUBITOS TUTTI FRUTTI MOGUL EXTREME X 15GRS", "15 g", "2do 70 Mi CRF", "-", "-", "12 u."],
+            ["7790580118617", "SECO", "GOLOSINAS", "MOGUL", "MOGUL", "GOMITAS MORAS MOGUL X 80 GRM", "80 g", "2do 70 Mi CRF", "-", "-", "12 u."],
+            ["7790580151713", "SECO", "GOLOSINAS", "MOGUL", "MOGUL", "GOMITAS DIENTES MOGUL X 80 GRM", "80 g", "2do 70 Mi CRF", "-", "-", "12 u."],
+            ["7790580131272", "SECO", "GOLOSINAS", "MOGUL", "MOGUL", "GOMITAS MORAS MOGUL X 50 GRS", "50 g", "2do 70 Mi CRF", "-", "-", "12 u."],
+            ["7790580141844", "SECO", "GOLOSINAS", "MOGUL", "MOGUL", "GOMITAS MOGUL JELLY BEANS X 50 GRS", "50 g", "2do 70 Mi CRF", "-", "-", "12 u."],
+            ["8445291565203", "SECO", "GOLOSINAS", "NESTLE", "NESTLE", "TABLETA CHOCOLATE CON LECHE NESTLE X 25 GRS", "22 g", "2x1 Mi CRF", "-", "-", "12 u."],
+            ["7622201761288", "SECO", "GOLOSINAS", "OREO", "OREO", "GALLETITAS CHOCOLATE RELL VAINILLA MINI OREO X50 G", "50 g", "2do 80 Mi CRF", "-", "-", "8 u."],
+            ["7790580421007", "SECO", "GOLOSINAS", "ROCKLETS", "ROCKLETS", "CONFITES RELLENOS CHOCOLATE ROCKLETS X 20 GRS", "20 g", "2do 70 Mi CRF", "-", "-", "12 u."],
+            ["7793890261530", "SECO", "GOLOSINAS", "SABE BIEN", "SABE BIEN", "BROWNIE BANADO CHOCOLATE SABEBIEN X 35 GRS", "35 g", "2do 70 Mi CRF", "-", "-", "12 u."],
+            ["7622202304705", "SECO", "GOLOSINAS", "SHOT", "SHOT", "ALFAJOR CHOCOLATE RELLE PASTA DE MANI SHOT X44 GRS", "44 g", "2do 70 Mi CRF", "-", "-", "12 u."],
+            ["7622202333255", "SECO", "GOLOSINAS", "SHOT", "SHOT", "TABLETA CHOCOLATE C LECHE Y MANI SHOT X 90 GRS", "90 g", "2do 80 Mi CRF", "-", "-", "12 u."],
+            ["7622300742584", "SECO", "GOLOSINAS", "TERRABUSI", "TERRABUSI", "ALFAJOR CHOCOLATE TERRABUSI 6 X 50 GRS", "300 g", "2do 70 Mi CRF", "-", "-", "12 u."],
+            ["7622300742621", "SECO", "GOLOSINAS", "TERRABUSI", "TERRABUSI", "ALFAJOR BLANCO GLASEADO TERRABUSI 6 X 38 GRS", "228 g", "2do 70 Mi CRF", "-", "-", "12 u."],
+            ["77903792", "SECO", "GOLOSINAS", "TERRABUSI", "TERRABUSI", "ALFAJOR CHOCOLATE TRIPLE TERRABUSI X 70 GRS", "70 g", "2do 70 Mi CRF", "-", "-", "12 u."],
+            ["77903860", "SECO", "GOLOSINAS", "TERRABUSI", "TERRABUSI", "ALFAJOR TERRABUSI TORTA X 70 GRS", "70 g", "2do 70 Mi CRF", "-", "-", "12 u."],
+            ["77939234", "SECO", "GOLOSINAS", "TERRABUSI", "TERRABUSI", "ALFAJOR CHOCOLATE TERRABUSI X 50 GRS", "50 g", "2do 70 Mi CRF", "-", "-", "12 u."],
+            ["77931764", "SECO", "GOLOSINAS", "TOPLINE", "TOPLINE", "CHICLE MENTA XPLOS TOPLINE X 14 GRS", "14 g", "2do 70 Mi CRF", "-", "-", "12 u."],
+            ["77939753", "SECO", "GOLOSINAS", "TOPLINE", "TOPLINE", "CHICLE ADULTO ATMIC STRONG TOPLINE 7 X 14.7 GRS", "14.7 g", "2do 70 Mi CRF", "-", "-", "12 u."],
+            ["77948588", "SECO", "GOLOSINAS", "TOPLINE", "TOPLINE", "CHICLE SANDIA TOPLINE X 14 GRS", "14 g", "2do 70 Mi CRF", "-", "-", "12 u."],
+            ["7790407031273", "SECO", "PREMEZCLAS Y CHOC", "AGUILA", "AGUILA", "TABLETA CHOCOLATE SEMIAMARGO AGUILA X 150 GRS", "150 g", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7790580155322", "SECO", "PREMEZCLAS Y CHOC", "AGUILA", "AGUILA", "TABLETA CHOCOLATE AMARGO 60 CACAO AGUILA X 130 GRS", "130 g", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7790580131487", "SECO", "PREMEZCLAS Y CHOC", "AGUILA", "AGUILA", "BANO REPOSTERIA SEMIAMARGO AGUILA BOLSA X 150 GRS", "150 g", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7622201705268", "SECO", "PREMEZCLAS Y CHOC", "ROYAL", "ROYAL", "FLAN VAINILLA ROYAL SOBRE X 60 GRS", "60 g", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7622201819736", "SECO", "PREMEZCLAS Y CHOC", "ROYAL", "ROYAL", "GELATINA CEREZA LIGHT ROYAL X 25 GRS", "25 g", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7622201820565", "SECO", "PREMEZCLAS Y CHOC", "ROYAL", "ROYAL", "GELATINA FRUTOS ROJOS LIGHT ROYAL X 25 GRS", "25 g", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7622201819620", "SECO", "PREMEZCLAS Y CHOC", "ROYAL", "ROYAL", "GELATINA FRUTILLA ROYAL X 25 GRS", "25 g", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7622201106034", "SECO", "PREMEZCLAS Y CHOC", "ROYAL", "ROYAL", "GELATINA SIN SABOR ROYAL X 14 GRS", "14 g", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7622201464882", "SECO", "PREMEZCLAS Y CHOC", "ROYAL", "ROYAL", "POLVO PARA HORNEAR ROYAL SOBRE X 50 GRS", "50 g", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7794000006188", "SECO", "SALSAS FRIAS", "HELLMANNS", "HELLMANNS", "KETCHUP HELLMANNS DOY PACK X 250 GRS", "250 g", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7794000006478", "SECO", "SALSAS FRIAS", "SAVORA", "SAVORA", "MOSTAZA ORIGINAL SAVORA DOY PACK X 250 GRS", "250 g", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7793890261844", "SECO", "SIN GLUTEN", "ZENISSIMO", "ZENISSIMO", "SALMAS HORNEADAS ZENISSIMO X 90 GRS", "90 g", "3x2 Mi CRF", "-", "-", "8 u."],
+            ["7790310985649", "SECO", "SNACKS", "DORITOS", "DORITOS", "NACHOS SABOR QUESO DORITOS X 77 GRS", "77 g", "2do 80 Mi CRF", "-", "-", "8 u."],
+            ["7790310985267", "SECO", "SNACKS", "DORITOS", "DORITOS", "NACHOS SABOR QUESO DORITOS X 40 GRS", "40 g", "2do 80 Mi CRF", "-", "-", "8 u."],
+            ["7790310987070", "SECO", "SNACKS", "DORITOS", "DORITOS", "NACHOS SWEET CHILI DORITOS X 74 GRS", "74 g", "2do 80 Mi CRF", "-", "-", "8 u."],
+            ["7790310984338", "SECO", "SNACKS", "PEHUAMAR", "PEHUAMAR", "MAICITOS QUESO HORNEADO PEHUAMAR BOLSA X 125 G", "125 g", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7790310985366", "SECO", "SNACKS", "PEHUAMAR", "PEHUAMAR", "PAPAS FRITAS CLASICAS PEHUAMAR X 135 GRS", "135 g", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7500810034354", "SECO", "SNACKS", "TAKIS", "TAKIS", "SNACK TAKIS ORIGINAL FLOW X 140 GRS", "140 g", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7500810034361", "SECO", "SNACKS", "TAKIS", "TAKIS", "SNACK TAKIS FUEGO X 85 GRS", "85 g", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7500810034477", "SECO", "SNACKS", "TAKIS", "TAKIS", "SNACK TAKIS ORIGINAL FLOW X 85 GRS", "85 g", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7500810034460", "SECO", "SNACKS", "TAKIS", "TAKIS", "SNACK TAKIS XPLOSION X 85 GRS", "85 g", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7500810041734", "SECO", "SNACKS", "TAKIS", "TAKIS", "NACHOS SABOR QUESO INTENSE TAKIS X 85 GRS", "85 g", "2do 70 Mi CRF", "-", "-", "8 u."],
+            ["7500810047095", "SECO", "SNACKS", "TAKIS", "TAKIS", "SNACKS BUCKIN RANCH TAKIS X 85 GRS", "85 g", "2do 70 Mi CRF", "-", "-", "8 u."],
+
+            // Block 2
+            ["7790070318619", "SECO", "PASTAS SECAS", "MATARAZZO", "MATARAZZO", "FIDEOS CODITOS RAYADOS MATARAZZO BOLS X 500 GRS", "500 g", "40% DTO Directo", "-", "-", "12 u."],
+            ["7790070318671", "SECO", "PASTAS SECAS", "MATARAZZO", "MATARAZZO", "FIDEOS NIDO FETTUCCINE MATARAZZO BOLSA X 500 GRS", "500 g", "40% DTO Directo", "-", "-", "12 u."],
+            ["7790070320001", "SECO", "PASTAS SECAS", "MATARAZZO", "MATARAZZO", "FIDEOS CABELLO DE ANGEL MATARAZZO BOLSA X 500 GRS", "500 g", "40% DTO Directo", "-", "-", "12 u."],
+            ["7790070320018", "SECO", "PASTAS SECAS", "MATARAZZO", "MATARAZZO", "FIDEOS AVE MARIA MATARAZZO BOLSA X 500 GRS", "500 g", "40% DTO Directo", "-", "-", "12 u."],
+            ["7790070320025", "SECO", "PASTAS SECAS", "MATARAZZO", "MATARAZZO", "FIDEOS DEDALITOS MATARAZZO BOLSA X 500 GRS", "500 g", "40% DTO Directo", "-", "-", "12 u."],
+            ["7790070320032", "SECO", "PASTAS SECAS", "MATARAZZO", "MATARAZZO", "FIDEOS MUNICIONES MATARAZZO BOLSA X 500 GRS", "500 g", "40% DTO Directo", "-", "-", "12 u."],
+            ["7790070322074", "SECO", "PASTAS SECAS", "MATARAZZO", "MATARAZZO", "FIDEOS PROTEINA PLUS TIRABUZON MATARAZZO X 400 GRS", "400 g", "40% DTO Directo", "-", "-", "12 u."],
+            ["7790070322081", "SECO", "PASTAS SECAS", "MATARAZZO", "MATARAZZO", "FIDEOS PROTEINA PLUS MOSTACHOL MATARAZZO X 400 GRS", "400 g", "40% DTO Directo", "-", "-", "12 u."],
+            ["7790070335937", "SECO", "PASTAS SECAS", "MATARAZZO", "MATARAZZO", "FIDEOS TIRABUZON 3 VEGETALES MATARAZZO X 500 GRS", "500 g", "40% DTO Directo", "-", "-", "12 u."],
+            ["7790070335944", "SECO", "PASTAS SECAS", "MATARAZZO", "MATARAZZO", "FIDEOS PENNE RIGATE 3 VEGET MATARAZZO X 500 GRS", "500 g", "40% DTO Directo", "-", "-", "12 u."],
+            ["7790070335968", "SECO", "PASTAS SECAS", "MATARAZZO", "MATARAZZO", "FIDEOS INTEGRALES TIRABUZON MATARAZZO X 500 GRS", "500 g", "40% DTO Directo", "-", "-", "12 u."],
+            ["7790070335975", "SECO", "PASTAS SECAS", "MATARAZZO", "MATARAZZO", "FIDEOS INTEGRALES SPAGHETTI MATARAZZO X 500 GRS", "500 g", "40% DTO Directo", "-", "-", "12 u."],
+            ["7790070335999", "SECO", "PASTAS SECAS", "MATARAZZO", "MATARAZZO", "FIDEOS S TACC PENNE RIGATE MATARAZZO X 500 GRS", "500 g", "40% DTO Directo", "-", "-", "12 u."],
+            ["7790070336002", "SECO", "PASTAS SECAS", "MATARAZZO", "MATARAZZO", "FIDEOS S TACC SPAGHETTI MATARAZZO X 500 GRS", "500 g", "40% DTO Directo", "-", "-", "12 u."],
+            ["7790070337016", "SECO", "PASTAS SECAS", "MATARAZZO", "MATARAZZO", "LASAGNA PRECOCIDA MATARAZZO X 250 GRS", "250 g", "40% DTO Directo", "-", "-", "12 u."],
+            ["7790070337023", "SECO", "PASTAS SECAS", "MATARAZZO", "MATARAZZO", "LASAGNA PRECOCIDA MATARAZZO X 400 GRS", "400 g", "40% DTO Directo", "-", "-", "12 u."],
+            ["7790230033031", "SECO", "PASTAS SECAS", "MATARAZZO", "MATARAZZO", "FIDEOS MONOS MATARAZZO BOLSA X 500 GRS", "500 g", "40% DTO Directo", "-", "-", "12 u."],
+            ["7790070336200", "SECO", "PASTAS SECAS", "MATARAZZO", "MATARAZZO", "FIDEOS PENNE RIGATE MATARAZZO X 500 GRS", "500 g", "Precio Oferta", "$2.099", "$1.230", "12 u."],
+            ["7790070336217", "SECO", "PASTAS SECAS", "MATARAZZO", "MATARAZZO", "FIDEOS MOSTACHOLES N52 RAYADO MATARAZZO X 500 GRS", "500 g", "Precio Oferta", "$2.099", "$1.230", "12 u."],
+            ["7790070336293", "SECO", "PASTAS SECAS", "MATARAZZO", "MATARAZZO", "FIDEOS TIRABUZONES N28 MATARAZZO X 500 GRS", "500 g", "Precio Oferta", "$2.099", "$1.230", "12 u."],
+            ["7790070336309", "SECO", "PASTAS SECAS", "MATARAZZO", "MATARAZZO", "FIDEOS ESPAGUETI N7 MATARAZZO X 500 GRS", "500 g", "Precio Oferta", "$2.099", "$1.230", "12 u."],
+            ["7790070336316", "SECO", "PASTAS SECAS", "MATARAZZO", "MATARAZZO", "FIDEOS TALLARINES N5 MATARAZZO X 500 GRS", "500 g", "Precio Oferta", "$2.099", "$1.230", "12 u."],
+            ["7790070336323", "SECO", "PASTAS SECAS", "MATARAZZO", "MATARAZZO", "FIDEOS BUCATTINI MATARAZZO X 500 GRS", "500 g", "Precio Oferta", "$2.099", "$1.230", "12 u."],
+            ["7791813888468", "BEBIDAS", "GASEOSAS", "PEPSI", "PEPSI", "GASEOSA COLA REGULAR PEPSI PET N X 2 LT", "2 L", "Precio Oferta", "$4.529", "$2.800", "48 u."],
+            ["7790250056881", "D.P.H.", "LIMPIEZA Y CASA", "SUSSEX", "SUSSEX", "ROLLO DE COCINA CLASICO SUSSEX 3 X 50 PAN", "3x50 p.", "Precio Oferta", "$2.929", "$1.890", "8 u."],
+            ["7790742363008", "P.A.S.", "LACTEOS", "LA SERENISIMA", "LA SERENISIMA", "LECHE UAT ENTERA FORT 3% LA SERENISIMA EDGE 1L", "1 L", "Precio Oferta", "$2.999", "$1.939", "24 u."],
+            ["7790742363107", "P.A.S.", "LACTEOS", "LA SERENISIMA", "LA SERENISIMA", "LECHE UAT PARC DESC FORT 1% LA SERENISIMA EDGE 1L", "1 L", "Precio Oferta", "$2.999", "$1.939", "24 u."],
+            ["7790742363206", "P.A.S.", "LACTEOS", "LA SERENISIMA", "LA SERENISIMA", "LECHE UAT PARC DESC FORT 2% LA SERENISIMA EDGE 1L", "1 L", "Precio Oferta", "$2.999", "$1.939", "24 u."],
+            ["7790290101602", "BEBIDAS", "APERITIVOS", "FERNET BRANCA", "FERNET BRANCA", "FERNET BRANCA BOTELLA X 750 CC", "750 cc", "COMBO 1+1 (Fernet+Coca)", "$19.700", "$21.200 (Combo)", "3 combos"],
+            ["7790290101817", "BEBIDAS", "APERITIVOS", "FERNET BRANCA", "FERNET BRANCA", "FERNET BRANCA MUNDIAL 2026 X 750 CC", "750 cc", "COMBO 1+1 (Fernet+Coca)", "$19.700", "$21.200 (Combo)", "3 combos"],
+            ["7790895000997", "BEBIDAS", "GASEOSAS", "COCA-COLA", "COCA-COLA", "GASEOSA COLA REGULAR COCA COLA PET X 2.25 LT", "2.25 L", "COMBO 1+1 (Fernet+Coca)", "$5.900", "$21.200 (Combo)", "3 combos"],
+            ["7790895067570", "BEBIDAS", "GASEOSAS", "COCA-COLA", "COCA-COLA ZERO", "GASEOSA COLA ZERO COCA COLA PET X 2.25 LT", "2.25 L", "COMBO 1+1 (Fernet+Coca)", "$5.900", "$21.200 (Combo)", "3 combos"],
+            ["7790895005312", "BEBIDAS", "GASEOSAS", "COCA-COLA", "COCA-COLA LIGHT", "GASEOSA COLA LIGHT COCA COLA PET X 2.25 LT", "2.25 L", "COMBO 1+1 (Fernet+Coca)", "$5.900", "$21.200 (Combo)", "3 combos"],
+            ["7790895005794", "BEBIDAS", "GASEOSAS", "COCA-COLA", "COCA-COLA", "GASEOSA COLA REGULAR COCA COLA PET X 2.5 LT", "2.5 L", "COMBO 1+1 (Fernet+Coca)", "$5.900", "$21.200 (Combo)", "3 combos"],
+            ["7790895068096", "BEBIDAS", "GASEOSAS", "COCA-COLA", "COCA-COLA ZERO", "GASEOSA COLA ZERO COCA COLA PET X 2.5 LT", "2.5 L", "COMBO 1+1 (Fernet+Coca)", "$5.900", "$21.200 (Combo)", "3 combos"],
+            ["7791720029466", "P.A.S.", "LACTEOS", "CARREFOUR CLASSIC", "CARREFOUR", "LECHE ENTERA UAT CARREFOUR CLASSIC TETRA X 1L", "1 L", "Precio Oferta", "$2.290", "$1.790", "24 u."],
+            ["7791720029473", "P.A.S.", "LACTEOS", "CARREFOUR CLASSIC", "CARREFOUR", "LECHE PARC. DESCRE UAT CARREFOUR CLASSIC TETRA X1L", "1 L", "Precio Oferta", "$2.290", "$1.790", "24 u."],
+            ["7791720029411", "P.A.S.", "LACTEOS", "CARREFOUR CLASSIC", "CARREFOUR", "LECHE UAT PARC DESC CARREFOUR CLASSIC BRIK X 1 LT", "1 L", "Precio Oferta", "$2.290", "$1.790", "24 u."],
+            ["7791720029404", "P.A.S.", "LACTEOS", "CARREFOUR CLASSIC", "CARREFOUR", "LECHE UAT ENTERA CARREFOUR CLASSIC BRIK X 1 LT", "1 L", "Precio Oferta", "$2.290", "$1.790", "24 u."],
+            ["7791720031711", "P.A.S.", "LACTEOS", "CARREFOUR CLASSIC", "CARREFOUR", "LECHE EN POLVO ENTERA CARREFOUR CLASSIC POUCH X 125G", "125 g", "Precio Oferta", "$2.190", "$1.990", "24 u."],
+            ["7791720031735", "P.A.S.", "LACTEOS", "CARREFOUR CLASSIC", "CARREFOUR", "LECHE EN POLVO DESCRE CARREFOUR CLASSIC POUCH X 125G", "125 g", "Precio Oferta", "$2.190", "$1.990", "24 u."],
+            ["7798159717483", "SECO", "GALLETITAS", "CARREFOUR", "CARREFOUR", "TOSTADAS GRUESAS LIGHT CARREFOUR X 200 GRS", "200 g", "Precio Oferta", "$1.650", "$1.490", "8 u."],
+            ["7798159717490", "SECO", "GALLETITAS", "CARREFOUR", "CARREFOUR", "TOSTADAS GRUESAS CLASICAS CARREFOUR X 200 GRS", "200 g", "Precio Oferta", "$1.650", "$1.490", "8 u."],
+            ["7798159717506", "SECO", "GALLETITAS", "CARREFOUR", "CARREFOUR", "TOSTADAS GRUESAS S SAL CARREFOUR X 200 GRS", "200 g", "Precio Oferta", "$1.650", "$1.490", "8 u."],
+            ["7798159717513", "SECO", "GALLETITAS", "CARREFOUR", "CARREFOUR", "TOSTADAS GRUESAS DULCES CARREFOUR X 200 GRS", "200 g", "Precio Oferta", "$1.650", "$1.490", "8 u."],
+            ["7791720024881", "SECO", "ALMACEN", "CARREFOUR", "CARREFOUR", "MATE COCIDO EN SAQUITOS S TACC CARREFOUR X 50 UNI", "50 u.", "Precio Oferta", "$1.750", "$1.550", "8 u."],
+            ["7791720030073", "SECO", "ALMACEN", "CARREFOUR CLASSIC", "CARREFOUR", "ARVEJAS SECAS REMOJADAS CLASSIC LATA X 300 GRS", "300 g", "Precio Oferta", "$729", "$659", "12 u."],
+            ["7791720025048", "BEBIDAS", "GASEOSAS", "CARREFOUR", "CARREFOUR", "GASEOSA REGULAR POMELO CARREFOUR X 2.25 LT", "2.25 L", "Precio Oferta", "$2.190", "$1.790", "24 u."],
+            ["7791720025055", "BEBIDAS", "GASEOSAS", "CARREFOUR", "CARREFOUR", "GASEOSA REGULAR LIMA LIMON CARREFOUR X 2.25 LT", "2.25 L", "Precio Oferta", "$2.190", "$1.790", "24 u."],
+            ["7791720028469", "BEBIDAS", "GASEOSAS", "CARREFOUR CLASSIC", "CARREFOUR", "GASEOSA GUARANA REG CARREFOUR CLASSIC PET X 2.25LT", "2.25 L", "Precio Oferta", "$2.190", "$1.790", "24 u."],
+            ["7791720028476", "BEBIDAS", "GASEOSAS", "CARREFOUR CLASSIC", "CARREFOUR", "GASEOSA LIGHT GUARANA CARREFOUR CLASSIC X 2.25 LT", "2.25 L", "Precio Oferta", "$2.190", "$1.790", "24 u."],
+            ["7791720029978", "BEBIDAS", "GASEOSAS", "CARREFOUR CLASSIC", "CARREFOUR", "GASEOSA LIGHT POMELO CARREFOUR CLASSIC PET X2.25LT", "2.25 L", "Precio Oferta", "$2.190", "$1.790", "24 u."],
+            ["7791720034972", "BEBIDAS", "GASEOSAS", "CARREFOUR CLASSIC", "CARREFOUR", "GASEOSA COLA DIETETICA CARREFOUR CLASSIC 2.25 LT", "2.25 L", "Precio Oferta", "$2.190", "$1.790", "24 u."],
+            ["7791720034989", "BEBIDAS", "GASEOSAS", "CARREFOUR CLASSIC", "CARREFOUR", "GASEOSA TONICA DIETETICA CARREFOUR CLASSIC 2.25 LT", "2.25 L", "Precio Oferta", "$2.190", "$1.790", "24 u."],
+            ["7798159715724", "BEBIDAS", "GASEOSAS", "CARREFOUR", "CARREFOUR", "GASEOSA NARANJA REG CARREFOUR PET X 2.25 LT", "2.25 L", "Precio Oferta", "$2.190", "$1.790", "24 u."],
+            ["7798159715731", "BEBIDAS", "GASEOSAS", "CARREFOUR", "CARREFOUR", "GASEOSA COLA REGULAR CARREFOUR PET X 2.25 LT", "2.25 L", "Precio Oferta", "$2.190", "$1.790", "24 u."],
+            ["7798159715755", "BEBIDAS", "GASEOSAS", "CARREFOUR", "CARREFOUR", "GASEOSA TONICA REG CARREFOUR PET X 2.25 LT", "2.25 L", "Precio Oferta", "$2.190", "$1.790", "24 u."],
+            ["7798159719739", "BEBIDAS", "GASEOSAS", "CARREFOUR", "CARREFOUR", "GASEOSA LIGHT LIMA LIMON CARREFOUR X 2.25 LT", "2.25 L", "Precio Oferta", "$2.190", "$1.790", "24 u."],
+            ["7798159719746", "BEBIDAS", "GASEOSAS", "CARREFOUR", "CARREFOUR", "GASEOSA LIGHT NARANJA CARREFOUR PET X 2.25 LT", "2.25 L", "Precio Oferta", "$2.190", "$1.790", "24 u."],
+            ["7791720002605", "D.P.H.", "LIMPIEZA Y CASA", "CARREFOUR ESSENTIAL", "CARREFOUR", "ROLLO DE COCINA CARREFOUR ESSENTIAL 3 X 40 PANOS", "3x40 p.", "Precio Oferta", "$2.490", "$1.790", "8 u."],
+            ["7791720029879", "D.P.H.", "LIMPIEZA Y CASA", "CARREFOUR ESSENTIAL", "CARREFOUR", "SUAVIZANTE ROPA FLORAL CARREFOUR ESSENTIAL 900 CC", "900 cc", "Precio Oferta", "$2.950", "$2.290", "8 u."],
+            ["7791720029886", "D.P.H.", "LIMPIEZA Y CASA", "CARREFOUR ESSENTIAL", "CARREFOUR", "SUVIZANTE ROPA CLASICO CARREFOUR ESSENTIAL 900 CC", "900 cc", "Precio Oferta", "$2.950", "$2.290", "8 u."],
+            ["7791720029893", "D.P.H.", "LIMPIEZA Y CASA", "CARREFOUR ESSENTIAL", "CARREFOUR", "SUVIZANTE ROPA BOSQUE CARREFOUR ESSENTIAL 900 CC", "900 cc", "Precio Oferta", "$2.950", "$2.290", "8 u."],
+            ["7798159718978", "D.P.H.", "LIMPIEZA Y CASA", "CARREFOUR", "CARREFOUR", "PAPEL HIGIENICO H SIMPLE CARREFOUR 4 X 30 MTS", "4x30m", "Precio Oferta", "$2.290", "$1.790", "8 u."],
+            ["7791720049075", "D.P.H.", "LIMPIEZA Y CASA", "CARREFOUR ESSENTIAL", "CARREFOUR", "PAPEL HIGIENICO HS CARREFOUR ESSENTIAL 4 X 30 MTS", "4x30m", "Precio Oferta", "$2.290", "$1.790", "8 u."],
+            ["7791720034781", "D.P.H.", "LIMPIEZA Y CASA", "CARREFOUR SOFT", "CARREFOUR", "PANUELOS DESC POCKET CARREFOUR SOFT 6 X 10 UNI", "6x10 u.", "2do 50 Mi CRF", "$1.720", "$1.290", "8 u."]
+        ];
+
+        function buildMasterDataset() {
+            masterData = [];
+            
+            // Check for Custom Data from Import
+            const customDataStr = localStorage.getItem('express_aniversario1_custom_data');
+            if (customDataStr) {
+                try {
+                    masterData = JSON.parse(customDataStr);
+                    filteredData = [...masterData];
+                    return;
+                } catch(e) {
+                    console.error("Error al leer datos guardados:", e);
+                }
+            }
+
+            exactAniversarioDataset.forEach(row => {
+                masterData.push({
+                    ean: row[0],
+                    origen: "Aniversario I Express (02/10-08/10)",
+                    seccion: row[1] || "VARIOS",
+                    categoria: row[2] || "-",
+                    marca: row[3] || "VARIOS",
+                    submarca: row[4] || "-",
+                    descripcion: row[5],
+                    contenido: row[6] || "-",
+                    mecanica: row[7] || "Promo",
+                    pvpNormal: row[8] && row[8] !== '-' ? row[8] : "-",
+                    pvpOferta: row[9] && row[9] !== '-' ? row[9] : "-",
+                    max: row[10] || "-"
+                });
+            });
+
+            filteredData = [...masterData];
+        }
+
+        function populateSelect(id, items) {
+            const select = document.getElementById(id);
+            if (!select) return;
+            select.innerHTML = `<option value="">Todas</option>`;
+            items.forEach(item => {
+                if (item && item !== '-') {
+                    const option = document.createElement('option');
+                    option.value = item;
+                    option.textContent = item;
+                    select.appendChild(option);
+                }
+            });
+        }
+
+        function populateFilters() {
+            populateSelect('filterSection', [...new Set(masterData.map(d => d.seccion))].sort());
+            populateSelect('filterCategoria', [...new Set(masterData.map(d => d.categoria))].filter(c => c !== '-').sort());
+            populateSelect('filterBrand', [...new Set(masterData.map(d => d.marca))].sort());
+            populateSelect('filterMecanica', [...new Set(masterData.map(d => d.mecanica))].sort());
+        }
+
+        function renderViews() {
+            const cardsContainer = document.getElementById('cardsView');
+            const tableBody = document.getElementById('tableBody');
+            const emptyState = document.getElementById('emptyState');
+
+            cardsContainer.innerHTML = '';
+            tableBody.innerHTML = '';
+
+            if (filteredData.length === 0) {
+                cardsContainer.classList.add('hidden');
+                document.getElementById('tableView').classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            if (currentViewMode === 'cards') {
+                cardsContainer.classList.remove('hidden');
+                document.getElementById('tableView').classList.add('hidden');
+            } else {
+                cardsContainer.classList.add('hidden');
+                document.getElementById('tableView').classList.remove('hidden');
+            }
+
+            filteredData.forEach(item => {
+                // Card View Element
+                const card = document.createElement('div');
+                card.className = "bg-white p-3 rounded-xl border border-slate-200/90 shadow-xs flex flex-col justify-between space-y-2 relative hover:shadow-md transition-shadow";
+
+                card.innerHTML = `
+                    <div class="space-y-1.5">
+                        <div class="flex items-center justify-between gap-1 text-[10px]">
+                            <span class="px-2 py-0.5 rounded-md border bg-emerald-50 text-emerald-800 border-emerald-200 font-bold truncate">${item.origen}</span>
+                            <span class="font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md truncate">${item.seccion} • ${item.categoria}</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-xs text-slate-900 leading-tight">${item.descripcion}</h4>
+                            <p class="text-[11px] text-slate-500 font-medium mt-0.5"><i class="fa-solid fa-tag text-[10px] mr-1 text-slate-400"></i><strong>${item.marca}</strong> ${item.submarca && item.submarca !== '-' && item.submarca !== item.marca ? `(${item.submarca})` : ''}</p>
+                        </div>
+                        <div class="p-2 rounded-lg bg-slate-50 border border-slate-100 text-xs space-y-1">
+                            <div class="flex justify-between items-center">
+                                <span class="text-[11px] text-slate-500 font-medium">Mecánica Promo:</span>
+                                <span class="font-bold text-blue-700 text-xs bg-blue-50 px-2 py-0.5 rounded border border-blue-200">${item.mecanica}</span>
+                            </div>
+                            ${item.pvpOferta !== '-' ? `
+                            <div class="flex justify-between items-center pt-1 border-t border-slate-200/60">
+                                <div>
+                                    <span class="text-[10px] text-slate-400 line-through mr-1">${item.pvpNormal}</span>
+                                    <span class="text-xs font-black text-emerald-600">${item.pvpOferta}</span>
+                                </div>
+                                <span class="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded">OFERTA</span>
+                            </div>
+                            ` : ''}
+                            ${item.max && item.max !== '-' ? `
+                            <div class="text-[10px] font-bold text-rose-600 pt-0.5 flex items-center gap-1">
+                                <i class="fa-solid fa-hand"></i> Límite Tope: ${item.max}
+                            </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                    <div class="pt-1.5 border-t border-slate-100 flex items-center justify-between text-[10px]">
+                        <span class="text-slate-500 font-mono font-bold">${item.ean}</span>
+                        <button onclick="copyEAN('${item.ean}')" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-md flex items-center gap-1 active:scale-95 transition-transform">
+                            <i class="fa-regular fa-copy"></i> Copiar EAN
+                        </button>
+                    </div>
+                `;
+                cardsContainer.appendChild(card);
+
+                // Table Row Element
+                const row = document.createElement('tr');
+                row.className = "hover:bg-slate-50 transition-colors";
+                row.innerHTML = `
+                    <td class="p-2.5 border-b font-mono font-bold text-[11px]">${item.ean}</td>
+                    <td class="p-2.5 border-b text-[11px] text-slate-600"><span class="font-bold text-slate-800">${item.seccion}</span><br><span class="text-[10px] text-slate-500">${item.categoria}</span></td>
+                    <td class="p-2.5 border-b font-bold text-[11px]">${item.marca}</td>
+                    <td class="p-2.5 border-b font-semibold text-slate-800">${item.descripcion}</td>
+                    <td class="p-2.5 border-b font-bold text-blue-700">${item.mecanica}</td>
+                    <td class="p-2.5 border-b text-right text-slate-400 line-through">${item.pvpNormal}</td>
+                    <td class="p-2.5 border-b text-right font-black text-emerald-600">${item.pvpOferta}</td>
+                    <td class="p-2.5 border-b text-center font-bold ${item.max && item.max !== '-' ? 'text-rose-600' : 'text-slate-400'}">${item.max || '-'}</td>
+                    <td class="p-2.5 border-b text-center">
+                        <button onclick="copyEAN('${item.ean}')" class="p-1 text-slate-500 hover:text-slate-800">
+                            <i class="fa-regular fa-copy"></i>
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+
+            updateKPIs();
+        }
+
+        function updateKPIs() {
+            document.getElementById('kpi-total').textContent = filteredData.length;
+            document.getElementById('header-total-badge').textContent = `${filteredData.length} SKUs`;
+            
+            const cervezasCount = filteredData.filter(d => 
+                d.descripcion.toLowerCase().includes('andes') || d.marca.toLowerCase().includes('andes')
+            ).length;
+            document.getElementById('kpi-cervezas').textContent = cervezasCount;
+
+            const topesCount = filteredData.filter(d => d.max && d.max !== '-' && d.max !== '').length;
+            document.getElementById('kpi-topes').textContent = topesCount;
+
+            const uniqueBrands = new Set(filteredData.map(d => d.marca)).size;
+            document.getElementById('kpi-brands').textContent = uniqueBrands;
+
+            const uniqueSecciones = new Set(filteredData.map(d => d.seccion)).size;
+            document.getElementById('kpi-secciones').textContent = uniqueSecciones;
+
+            document.getElementById('showing-count').textContent = filteredData.length;
+            document.getElementById('total-count').textContent = masterData.length;
+        }
+
+        function applyFilters() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            const seccion = document.getElementById('filterSection').value;
+            const categoria = document.getElementById('filterCategoria') ? document.getElementById('filterCategoria').value : '';
+            const marca = document.getElementById('filterBrand').value;
+            const mecanica = document.getElementById('filterMecanica').value;
+
+            document.getElementById('clearSearchBtn').classList.toggle('hidden', query === '');
+
+            filteredData = masterData.filter(item => {
+                const matchesSearch = query === '' ||
+                    item.descripcion.toLowerCase().includes(query) ||
+                    item.ean.includes(query) ||
+                    item.marca.toLowerCase().includes(query) ||
+                    item.mecanica.toLowerCase().includes(query) ||
+                    item.categoria.toLowerCase().includes(query);
+
+                const matchesSection = seccion === '' || item.seccion === seccion;
+                const matchesCategoria = categoria === '' || item.categoria === categoria;
+                const matchesBrand = marca === '' || item.marca === marca;
+                const matchesMecanica = mecanica === '' || item.mecanica === mecanica;
+
+                return matchesSearch && matchesSection && matchesCategoria && matchesBrand && matchesMecanica;
+            });
+
+            renderViews();
+        }
+
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('filterSection').value = '';
+            if (document.getElementById('filterCategoria')) document.getElementById('filterCategoria').value = '';
+            document.getElementById('filterBrand').value = '';
+            document.getElementById('filterMecanica').value = '';
+            applyFilters();
+        }
+
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            applyFilters();
+        }
+
+        function setViewMode(mode) {
+            currentViewMode = mode;
+            const btnCards = document.getElementById('viewCardsBtn');
+            const btnTable = document.getElementById('viewTableBtn');
+
+            if (mode === 'cards') {
+                btnCards.className = "px-2.5 py-1 text-xs font-bold rounded-lg transition-all bg-white text-slate-900 shadow-xs";
+                btnTable.className = "px-2.5 py-1 text-xs font-semibold rounded-lg transition-all text-slate-600 hover:text-slate-900";
+            } else {
+                btnTable.className = "px-2.5 py-1 text-xs font-bold rounded-lg transition-all bg-white text-slate-900 shadow-xs";
+                btnCards.className = "px-2.5 py-1 text-xs font-semibold rounded-lg transition-all text-slate-600 hover:text-slate-900";
+            }
+            renderViews();
+        }
+
+        function toggleFilterContainer() {
+            const container = document.getElementById('filterContainer');
+            container.classList.toggle('hidden');
+        }
+
+        function switchTab(tabId) {
+            document.getElementById('tab-promos').classList.add('hidden');
+            document.getElementById('tab-checklist').classList.add('hidden');
+
+            document.getElementById('nav-promos').className = "px-3 py-1.5 rounded-lg text-slate-400 hover:text-white flex items-center gap-1.5 shrink-0";
+            document.getElementById('nav-checklist').className = "px-3 py-1.5 rounded-lg text-slate-400 hover:text-white flex items-center gap-1.5 shrink-0";
+
+            if (tabId === 'tab-promos') {
+                document.getElementById('tab-promos').classList.remove('hidden');
+                document.getElementById('nav-promos').className = "px-3 py-1.5 rounded-lg text-blue-400 bg-slate-800 border border-slate-700 flex items-center gap-1.5 shrink-0 font-bold";
+            } else if (tabId === 'tab-checklist') {
+                document.getElementById('tab-checklist').classList.remove('hidden');
+                document.getElementById('nav-checklist').className = "px-3 py-1.5 rounded-lg text-amber-400 bg-slate-800 border border-slate-700 flex items-center gap-1.5 shrink-0 font-bold";
+                renderChecklist();
+            }
+        }
+
+        const checklistTasks = [
+            "Cervezas Andes Blanca (1L, 710cc, 473cc, Pack 6x473) y Andes Negra 340cc con cartel 2do 50% Mi CRF.",
+            "Línea Pastas Matarazzo 500g (Penne Rigate, Mostacholes N52, Tirabuzones, Espagueti, Tallarines, Bucattini) señalizadas a $1.230.",
+            "Combo Fernet Branca 750cc + Coca-Cola 2.25L / 2.5L a $21.200 exhibido con tope de 3 combos por cliente.",
+            "Leche La Serenísima Edge 1L (Entera 3%, Parc Desc 1%, 2%) a $1.939 y Leche Carrefour Classic a $1.790.",
+            "Gaseosas Pepsi 1.5L, 2L ($2.800), 7Up, Paso de los Toros y Mirinda etiquetadas con descuento.",
+            "Golosinas Oreo, Milka, Arcor, Terrabusi, Topline y Chocolates Águila verificados en línea de caja y góndola.",
+            "Artículos D.P.H. (Dove, Gillette, Ayudín 2L, Cif Bioactive, Mr Músculo) controlados con tope de 8u."
+        ];
+
+        function renderChecklist() {
+            const container = document.getElementById('checklistItemsContainer');
+            container.innerHTML = '';
+
+            const savedState = JSON.parse(localStorage.getItem('express_aniversario1_checklist') || '{}');
+
+            checklistTasks.forEach((task, idx) => {
+                const isChecked = savedState[idx] || false;
+                const div = document.createElement('div');
+                div.className = `p-3 rounded-xl border transition-all flex items-center justify-between gap-3 ${isChecked ? 'bg-emerald-50/70 border-emerald-200 text-emerald-950' : 'bg-slate-50 border-slate-200 text-slate-800'}`;
+                div.innerHTML = `
+                    <label class="flex items-center gap-3 cursor-pointer flex-1 text-xs sm:text-sm font-medium">
+                        <input type="checkbox" onchange="toggleTask(${idx})" ${isChecked ? 'checked' : ''} class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500">
+                        <span class="${isChecked ? 'line-through text-slate-500' : ''}">${task}</span>
+                    </label>
+                    <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${isChecked ? 'bg-emerald-200 text-emerald-800' : 'bg-slate-200 text-slate-600'}">
+                        ${isChecked ? 'OK' : 'Pendiente'}
+                    </span>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function toggleTask(idx) {
+            const savedState = JSON.parse(localStorage.getItem('express_aniversario1_checklist') || '{}');
+            savedState[idx] = !savedState[idx];
+            localStorage.setItem('express_aniversario1_checklist', JSON.stringify(savedState));
+            renderChecklist();
+        }
+
+        function resetChecklist() {
+            localStorage.removeItem('express_aniversario1_checklist');
+            renderChecklist();
+            showToast("Checklist reestablished");
+        }
+
+        function copyEAN(ean) {
+            if (!ean || ean === '-') return;
+            const el = document.createElement('textarea');
+            el.value = ean;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            showToast(`EAN ${ean} copiado`);
+        }
+
+        function exportToCSV() {
+            if (filteredData.length === 0) {
+                showToast("No hay datos para exportar");
+                return;
+            }
+
+            let csv = "\uFEFFEAN;Origen;Seccion;Categoria;Marca;Submarca;Descripcion;Contenido;Mecanica;PVP Normal;PVP Oferta;Max\n";
+            filteredData.forEach(item => {
+                csv += `"${item.ean}";"${item.origen}";"${item.seccion}";"${item.categoria}";"${item.marca}";"${item.submarca || '-'}";"${item.descripcion}";"${item.contenido || '-'}";"${item.mecanica}";"${item.pvpNormal}";"${item.pvpOferta}";"${item.max || '-'}"\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", `Internas_Express_AniversarioI_${new Date().toISOString().slice(0,10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast("Archivo CSV descargado con éxito");
+        }
+
+        function openImportModal() {
+            document.getElementById('importModal').classList.remove('hidden');
+        }
+
+        function closeImportModal() {
+            document.getElementById('importModal').classList.add('hidden');
+        }
+
+        function processCustomImport() {
+            const text = document.getElementById('csvImportText').value.trim();
+            if (!text) {
+                showToast("Pega líneas de datos para importar");
+                return;
+            }
+
+            const lines = text.split('\n');
+            const newMaster = [];
+
+            lines.forEach((line, idx) => {
+                if (idx === 0 && (line.toLowerCase().includes('ean') || line.toLowerCase().includes('seccion'))) return;
+                
+                const delimiter = line.includes(';') ? ';' : '\t';
+                const cols = line.split(delimiter).map(c => c.trim().replace(/^"|"$/g, ''));
+
+                if (cols.length >= 3) {
+                    newMaster.push({
+                        ean: cols[0] || `-`,
+                        origen: "Importación Personalizada",
+                        seccion: cols[1] || "VARIOS",
+                        categoria: cols[2] || "-",
+                        marca: cols[3] || "VARIOS",
+                        submarca: "-",
+                        descripcion: cols[4] || cols[2] || "Producto sin nombre",
+                        contenido: "-",
+                        mecanica: cols[5] || cols[3] || "Promo",
+                        pvpNormal: cols[6] || "-",
+                        pvpOferta: cols[7] || "-",
+                        max: cols[8] || "-"
+                    });
+                }
+            });
+
+            if (newMaster.length > 0) {
+                masterData = newMaster;
+                localStorage.setItem('express_aniversario1_custom_data', JSON.stringify(masterData));
+                populateFilters();
+                applyFilters();
+                closeImportModal();
+                showToast(`¡Se importaron ${newMaster.length} SKUs correctamente!`);
+            } else {
+                showToast("Formato no reconocido. Verifica el texto pegado.");
+            }
+        }
+
+        function clearCustomData() {
+            localStorage.removeItem('express_aniversario1_custom_data');
+            buildMasterDataset();
+            populateFilters();
+            applyFilters();
+            closeImportModal();
+            showToast("Datos restaurados a la planilla original de Aniversario I.");
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').textContent = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        window.onload = function() {
+            buildMasterDataset();
+            populateFilters();
+            renderViews();
+        };
+    </script>
+</body>
+</html>
