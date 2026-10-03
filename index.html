@@ -2,15 +2,37 @@
 <html lang="es" class="h-full bg-slate-100">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#0f172a">
     <title>Control Interno Express - Aniversario I (02/10 al 08/10/2026)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * { -webkit-tap-highlight-color: transparent; }
+        html { -webkit-text-size-adjust: 100%; }
+        body { overflow-x: hidden; }
+        .no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
         ::-webkit-scrollbar { height: 6px; width: 6px; }
         ::-webkit-scrollbar-track { background: #f1f5f9; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+
+        /* Navegación superior (desktop) */
+        .top-nav .nav-btn { display: flex; align-items: center; gap: .375rem; padding: .375rem .75rem; border-radius: .5rem; border: 1px solid transparent; color: #94a3b8; font-size: .75rem; font-weight: 600; white-space: nowrap; }
+        .top-nav .nav-btn:hover { color: #fff; }
+        .top-nav .nav-btn.active { color: #60a5fa; background: #1e293b; border-color: #334155; font-weight: 700; }
+
+        /* Navegación inferior (mobile / tablet) */
+        .bottom-nav { padding-bottom: env(safe-area-inset-bottom); }
+        .bottom-nav .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .125rem; min-height: 3.5rem; color: #64748b; font-size: .6875rem; font-weight: 600; position: relative; }
+        .bottom-nav .nav-btn i { font-size: 1.125rem; }
+        .bottom-nav .nav-btn.active { color: #2563eb; font-weight: 800; }
+        .bottom-nav .nav-btn.active::before { content: ""; position: absolute; top: 0; left: 25%; right: 25%; height: 3px; border-radius: 0 0 4px 4px; background: #2563eb; }
+
+        /* Evita el zoom automático de iOS al enfocar inputs */
+        input, select, textarea { font-size: 16px; }
+        @media (min-width: 640px) { input, select, textarea { font-size: 14px; } }
+
         @media print {
             .no-print { display: none !important; }
             .print-only { display: block !important; }
@@ -18,58 +40,52 @@
         }
     </style>
 </head>
-<body class="bg-slate-100 text-slate-800 font-sans min-h-full flex flex-col antialiased selection:bg-blue-600 selection:text-white pb-16 lg:pb-0">
+<body class="bg-slate-100 text-slate-800 font-sans min-h-full flex flex-col antialiased selection:bg-blue-600 selection:text-white pb-24 lg:pb-0">
 
     <!-- HEADER -->
-    <header class="bg-slate-900 text-white sticky top-0 z-40 shadow-lg border-b border-slate-800 no-print">
-        <div class="max-w-7xl mx-auto px-3 sm:px-6 py-2.5">
-            <div class="flex items-center justify-between gap-2">
-                <!-- Title & Badge -->
-                <div class="flex items-center gap-2.5 min-w-0">
-                    <div class="p-2 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl text-white shrink-0 shadow-md">
-                        <i class="fa-solid fa-clipboard-check text-lg sm:text-xl"></i>
-                    </div>
-                    <div class="min-w-0">
-                        <div class="flex items-center gap-1.5">
-                            <h1 class="text-base sm:text-lg font-black tracking-tight truncate leading-tight">
-                                Control Express
-                            </h1>
-                            <span class="bg-emerald-500/20 text-emerald-300 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-500/30">
-                                Internas Express - Aniversario I
-                            </span>
-                        </div>
-                        <p class="text-[11px] text-slate-400 truncate">
-                            Vigencias: <span class="text-emerald-400 font-semibold">02/10/2026 al 08/10/2026</span> • <span id="header-total-badge" class="text-blue-300 font-semibold">0 SKUs</span>
-                        </p>
-                    </div>
+    <header class="bg-slate-900 text-white lg:sticky lg:top-0 z-40 shadow-lg border-b border-slate-800 no-print pt-[env(safe-area-inset-top)]">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 py-2.5 flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2.5 min-w-0">
+                <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl text-white shrink-0 shadow-md flex items-center justify-center">
+                    <i class="fa-solid fa-clipboard-check text-lg"></i>
                 </div>
-                
-                <!-- Quick Actions -->
-                <div class="flex items-center gap-1.5 shrink-0">
-                    <button onclick="openImportModal()" class="px-2.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all">
-                        <i class="fa-solid fa-file-import"></i>
-                        <span class="hidden sm:inline">Pegar / Agregar Planilla</span>
-                    </button>
-                    <button onclick="switchTab('tab-checklist')" class="px-2.5 py-1.5 bg-blue-600 active:bg-blue-700 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all">
-                        <i class="fa-solid fa-list-check"></i>
-                        <span class="hidden sm:inline">Checklist Turno</span>
-                    </button>
-                    <button onclick="exportToCSV()" class="p-2 bg-emerald-600 text-white rounded-lg text-xs font-semibold flex items-center gap-1 shadow-sm">
-                        <i class="fa-solid fa-download text-sm"></i>
-                        <span class="hidden lg:inline">Exportar CSV</span>
-                    </button>
+                <div class="min-w-0">
+                    <div class="flex items-center gap-2">
+                        <h1 class="text-base sm:text-lg font-black tracking-tight truncate leading-tight">Control Express</h1>
+                        <span class="hidden md:inline bg-emerald-500/20 text-emerald-300 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-500/30 whitespace-nowrap">
+                            Internas Express - Aniversario I
+                        </span>
+                    </div>
+                    <p class="text-[11px] text-slate-400 truncate">
+                        <span class="text-emerald-400 font-semibold">Aniversario I · 02/10 al 08/10</span> · <span id="header-total-badge" class="text-blue-300 font-semibold">0 SKUs</span>
+                    </p>
                 </div>
+            </div>
+
+            <div class="flex items-center gap-2 shrink-0">
+                <button onclick="openImportModal()" aria-label="Pegar o agregar planilla" class="h-10 min-w-10 px-3 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm transition-colors">
+                    <i class="fa-solid fa-file-import"></i>
+                    <span class="hidden md:inline">Pegar / Agregar Planilla</span>
+                </button>
+                <button onclick="switchTab('tab-checklist')" class="hidden lg:flex h-10 px-3 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white rounded-xl text-xs font-bold items-center gap-1.5 shadow-sm transition-colors">
+                    <i class="fa-solid fa-list-check"></i>
+                    <span>Checklist Turno</span>
+                </button>
+                <button onclick="exportToCSV()" aria-label="Exportar CSV" class="h-10 min-w-10 px-3 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm transition-colors">
+                    <i class="fa-solid fa-download"></i>
+                    <span class="hidden xl:inline">Exportar CSV</span>
+                </button>
             </div>
         </div>
 
-        <!-- Navigation Tabs -->
-        <div class="bg-slate-950 border-t border-slate-800 px-3 sm:px-6">
-            <div class="max-w-7xl mx-auto flex items-center gap-1 sm:gap-2 overflow-x-auto py-1 text-xs font-semibold no-scrollbar">
-                <button id="nav-promos" onclick="switchTab('tab-promos')" class="px-3 py-1.5 rounded-lg text-blue-400 bg-slate-800 border border-slate-700 flex items-center gap-1.5 shrink-0 font-bold">
+        <!-- Navigation Tabs (solo desktop; en mobile va abajo) -->
+        <div class="hidden lg:block bg-slate-950 border-t border-slate-800 px-6">
+            <div class="top-nav max-w-7xl mx-auto flex items-center gap-2 py-1.5">
+                <button class="nav-btn active" data-tab="tab-promos" onclick="switchTab('tab-promos')">
                     <i class="fa-solid fa-boxes-stacked"></i>
                     <span>Catálogo de SKUs Planilla Aniversario I</span>
                 </button>
-                <button id="nav-checklist" onclick="switchTab('tab-checklist')" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white flex items-center gap-1.5 shrink-0">
+                <button class="nav-btn" data-tab="tab-checklist" onclick="switchTab('tab-checklist')">
                     <i class="fa-solid fa-square-check text-amber-400"></i>
                     <span>Checklist Salón & Punteras</span>
                 </button>
@@ -81,122 +97,122 @@
 
         <!-- TAB 1: MASTER PROMOS & SKUS -->
         <div id="tab-promos" class="space-y-3 sm:space-y-5">
-            
-            <!-- Quick KPI Metrics Grid -->
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3">
-                <div class="bg-white p-2.5 sm:p-3.5 rounded-xl border border-slate-200/80 shadow-xs flex items-center justify-between">
-                    <div>
-                        <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">SKUs Cargados</p>
-                        <p class="text-lg sm:text-2xl font-black text-slate-800" id="kpi-total">0</p>
+
+            <!-- KPIs: tira horizontal en mobile, grilla desde sm -->
+            <div class="no-scrollbar flex gap-2 overflow-x-auto snap-x snap-mandatory -mx-2.5 px-2.5 pb-1 sm:mx-0 sm:px-0 sm:pb-0 sm:overflow-visible sm:grid sm:grid-cols-3 lg:grid-cols-5 sm:gap-3">
+                <div class="snap-start shrink-0 w-36 sm:w-auto bg-white p-3 rounded-xl border border-slate-200/80 shadow-sm flex items-center justify-between gap-2">
+                    <div class="min-w-0">
+                        <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider truncate">SKUs</p>
+                        <p class="text-xl sm:text-2xl font-black text-slate-800" id="kpi-total">0</p>
                     </div>
-                    <div class="w-8 h-8 sm:w-10 sm:h-10 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center shrink-0">
-                        <i class="fa-solid fa-barcode text-sm sm:text-lg"></i>
+                    <div class="w-9 h-9 sm:w-10 sm:h-10 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-barcode"></i>
                     </div>
                 </div>
 
-                <div class="bg-white p-2.5 sm:p-3.5 rounded-xl border border-slate-200/80 shadow-xs flex items-center justify-between">
-                    <div>
-                        <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">Cervezas Andes</p>
-                        <p class="text-lg sm:text-2xl font-black text-amber-600" id="kpi-cervezas">0</p>
+                <div class="snap-start shrink-0 w-36 sm:w-auto bg-white p-3 rounded-xl border border-slate-200/80 shadow-sm flex items-center justify-between gap-2">
+                    <div class="min-w-0">
+                        <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider truncate">Cervezas Andes</p>
+                        <p class="text-xl sm:text-2xl font-black text-amber-600" id="kpi-cervezas">0</p>
                     </div>
-                    <div class="w-8 h-8 sm:w-10 sm:h-10 bg-amber-50 text-amber-600 rounded-lg flex items-center justify-center shrink-0">
-                        <i class="fa-solid fa-beer-mug-empty text-sm sm:text-lg"></i>
-                    </div>
-                </div>
-
-                <div class="bg-white p-2.5 sm:p-3.5 rounded-xl border border-slate-200/80 shadow-xs flex items-center justify-between">
-                    <div>
-                        <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">Topes Definidos</p>
-                        <p class="text-lg sm:text-2xl font-black text-rose-600" id="kpi-topes">0</p>
-                    </div>
-                    <div class="w-8 h-8 sm:w-10 sm:h-10 bg-rose-50 text-rose-600 rounded-lg flex items-center justify-center shrink-0">
-                        <i class="fa-solid fa-hand text-sm sm:text-lg"></i>
+                    <div class="w-9 h-9 sm:w-10 sm:h-10 bg-amber-50 text-amber-600 rounded-lg flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-beer-mug-empty"></i>
                     </div>
                 </div>
 
-                <div class="bg-white p-2.5 sm:p-3.5 rounded-xl border border-slate-200/80 shadow-xs flex items-center justify-between">
-                    <div>
-                        <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">Marcas Registradas</p>
-                        <p class="text-lg sm:text-2xl font-black text-slate-800" id="kpi-brands">0</p>
+                <div class="snap-start shrink-0 w-36 sm:w-auto bg-white p-3 rounded-xl border border-slate-200/80 shadow-sm flex items-center justify-between gap-2">
+                    <div class="min-w-0">
+                        <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider truncate">Con tope</p>
+                        <p class="text-xl sm:text-2xl font-black text-rose-600" id="kpi-topes">0</p>
                     </div>
-                    <div class="w-8 h-8 sm:w-10 sm:h-10 bg-purple-50 text-purple-600 rounded-lg flex items-center justify-center shrink-0">
-                        <i class="fa-solid fa-tags text-sm sm:text-lg"></i>
+                    <div class="w-9 h-9 sm:w-10 sm:h-10 bg-rose-50 text-rose-600 rounded-lg flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-hand"></i>
                     </div>
                 </div>
 
-                <div class="col-span-2 sm:col-span-1 bg-white p-2.5 sm:p-3.5 rounded-xl border border-slate-200/80 shadow-xs flex items-center justify-between">
-                    <div>
-                        <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">Secciones Activas</p>
-                        <p class="text-lg sm:text-2xl font-black text-blue-600" id="kpi-secciones">0</p>
+                <div class="snap-start shrink-0 w-36 sm:w-auto bg-white p-3 rounded-xl border border-slate-200/80 shadow-sm flex items-center justify-between gap-2">
+                    <div class="min-w-0">
+                        <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider truncate">Marcas</p>
+                        <p class="text-xl sm:text-2xl font-black text-slate-800" id="kpi-brands">0</p>
                     </div>
-                    <div class="w-8 h-8 sm:w-10 sm:h-10 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center shrink-0">
-                        <i class="fa-solid fa-layer-group text-sm sm:text-lg"></i>
+                    <div class="w-9 h-9 sm:w-10 sm:h-10 bg-purple-50 text-purple-600 rounded-lg flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-tags"></i>
+                    </div>
+                </div>
+
+                <div class="snap-start shrink-0 w-36 sm:w-auto bg-white p-3 rounded-xl border border-slate-200/80 shadow-sm flex items-center justify-between gap-2">
+                    <div class="min-w-0">
+                        <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider truncate">Secciones</p>
+                        <p class="text-xl sm:text-2xl font-black text-blue-600" id="kpi-secciones">0</p>
+                    </div>
+                    <div class="w-9 h-9 sm:w-10 sm:h-10 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-layer-group"></i>
                     </div>
                 </div>
             </div>
 
-            <!-- Controls Panel -->
-            <div class="bg-white rounded-xl border border-slate-200/90 shadow-sm p-3 space-y-3">
-                <div class="flex flex-col sm:flex-row gap-2 items-stretch justify-between">
-                    <!-- Search Input -->
-                    <div class="relative flex-1">
-                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs sm:text-sm"></i>
-                        <input type="text" id="searchInput" placeholder="Buscar por EAN, descripción, marca (Ej: 7790895003295, Matarazzo, Oreo, Andes)..." oninput="applyFilters()"
-                            class="w-full pl-9 pr-8 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all">
-                        <button onclick="clearSearch()" id="clearSearchBtn" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1">
-                            <i class="fa-solid fa-xmark text-xs"></i>
+            <!-- Controles (pegajosos en mobile para buscar sin volver arriba) -->
+            <div class="sticky top-0 z-30 -mx-2.5 sm:-mx-6 px-2.5 sm:px-6 py-2 bg-slate-100/95 backdrop-blur lg:static lg:mx-0 lg:px-0 lg:py-0 lg:bg-transparent no-print">
+                <div class="bg-white rounded-xl border border-slate-200/90 shadow-sm p-2.5 sm:p-3 space-y-2.5">
+                    <div class="relative">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm pointer-events-none"></i>
+                        <input type="search" id="searchInput" inputmode="search" enterkeyhint="search" autocomplete="off" placeholder="Buscar EAN, producto o marca…" oninput="onSearchInput()"
+                            class="w-full h-11 pl-10 pr-10 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all [&::-webkit-search-cancel-button]:hidden">
+                        <button onclick="clearSearch()" id="clearSearchBtn" aria-label="Borrar búsqueda" class="hidden absolute right-1 top-1/2 -translate-y-1/2 w-10 h-10 text-slate-400 hover:text-slate-600">
+                            <i class="fa-solid fa-circle-xmark"></i>
                         </button>
                     </div>
 
-                    <!-- Actions Bar -->
-                    <div class="flex items-center gap-1.5 self-end sm:self-auto w-full sm:w-auto">
-                        <button onclick="toggleFilterContainer()" class="flex-1 sm:flex-none px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl border border-slate-300 flex items-center justify-center gap-1.5">
-                            <i class="fa-solid fa-filter text-blue-600"></i>
-                            <span>Filtros Avanzados</span>
+                    <div class="flex items-center gap-2">
+                        <button onclick="toggleFilterContainer()" id="filterToggleBtn" aria-expanded="false" class="flex-1 sm:flex-none h-10 px-3.5 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-700 text-xs font-bold rounded-xl border border-slate-300 flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-sliders text-blue-600"></i>
+                            <span>Filtros</span>
+                            <span id="filterBadge" class="hidden min-w-5 h-5 px-1 rounded-full bg-blue-600 text-white text-[10px] font-black items-center justify-center">0</span>
                         </button>
 
-                        <div class="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
-                            <button id="viewCardsBtn" onclick="setViewMode('cards')" class="px-2.5 py-1 text-xs font-bold rounded-lg transition-all bg-white text-slate-900 shadow-xs">
+                        <div class="hidden md:flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
+                            <button id="viewCardsBtn" onclick="setViewMode('cards')" class="px-3 py-1.5 text-xs font-bold rounded-lg transition-all bg-white text-slate-900 shadow-sm">
                                 <i class="fa-solid fa-grip"></i> Cards
                             </button>
-                            <button id="viewTableBtn" onclick="setViewMode('table')" class="px-2.5 py-1 text-xs font-semibold rounded-lg transition-all text-slate-600 hover:text-slate-900">
+                            <button id="viewTableBtn" onclick="setViewMode('table')" class="px-3 py-1.5 text-xs font-semibold rounded-lg transition-all text-slate-600 hover:text-slate-900">
                                 <i class="fa-solid fa-table"></i> Tabla
                             </button>
                         </div>
-                    </div>
-                </div>
 
-                <!-- Expandable Filters -->
-                <div id="filterContainer" class="hidden space-y-2 pt-2 border-t border-slate-100">
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-500 mb-1">Sección</label>
-                            <select id="filterSection" onchange="applyFilters()" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white">
-                                <option value="">Todas las Secciones</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-500 mb-1">Categoría / Familia</label>
-                            <select id="filterCategoria" onchange="applyFilters()" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white">
-                                <option value="">Todas las Categorías</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-500 mb-1">Marca</label>
-                            <select id="filterBrand" onchange="applyFilters()" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white">
-                                <option value="">Todas las Marcas</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-500 mb-1">Mecánica Promocional</label>
-                            <select id="filterMecanica" onchange="applyFilters()" class="w-full px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white">
-                                <option value="">Todas las Mecánicas</option>
-                            </select>
-                        </div>
+                        <p class="ml-auto text-xs text-slate-500 text-right leading-tight whitespace-nowrap">
+                            <strong id="showing-count" class="text-slate-900">0</strong> de <strong id="total-count" class="text-slate-900">0</strong><span class="hidden sm:inline"> SKUs</span>
+                        </p>
                     </div>
-                    <div class="flex justify-between items-center text-xs text-slate-500 pt-1">
-                        <span>Mostrando <strong id="showing-count" class="text-slate-900">0</strong> de <strong id="total-count" class="text-slate-900">0</strong> SKUs fidedignos</span>
-                        <button onclick="resetFilters()" class="text-rose-600 font-bold hover:underline">
+
+                    <!-- Filtros avanzados -->
+                    <div id="filterContainer" class="hidden space-y-3 pt-2.5 border-t border-slate-100 max-h-[55vh] overflow-y-auto">
+                        <div class="grid grid-cols-1 min-[440px]:grid-cols-2 lg:grid-cols-4 gap-2.5">
+                            <div>
+                                <label for="filterSection" class="block text-[11px] font-bold text-slate-500 mb-1">Sección</label>
+                                <select id="filterSection" onchange="applyFilters()" class="w-full h-11 sm:h-10 px-2.5 border border-slate-300 rounded-lg bg-white">
+                                    <option value="">Todas las Secciones</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="filterCategoria" class="block text-[11px] font-bold text-slate-500 mb-1">Categoría / Familia</label>
+                                <select id="filterCategoria" onchange="applyFilters()" class="w-full h-11 sm:h-10 px-2.5 border border-slate-300 rounded-lg bg-white">
+                                    <option value="">Todas las Categorías</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="filterBrand" class="block text-[11px] font-bold text-slate-500 mb-1">Marca</label>
+                                <select id="filterBrand" onchange="applyFilters()" class="w-full h-11 sm:h-10 px-2.5 border border-slate-300 rounded-lg bg-white">
+                                    <option value="">Todas las Marcas</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="filterMecanica" class="block text-[11px] font-bold text-slate-500 mb-1">Mecánica Promocional</label>
+                                <select id="filterMecanica" onchange="applyFilters()" class="w-full h-11 sm:h-10 px-2.5 border border-slate-300 rounded-lg bg-white">
+                                    <option value="">Todas las Mecánicas</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button onclick="resetFilters()" class="w-full sm:w-auto h-10 px-4 text-rose-600 text-xs font-bold rounded-xl border border-rose-200 bg-rose-50 hover:bg-rose-100 active:bg-rose-200">
                             <i class="fa-solid fa-rotate-right"></i> Limpiar Filtros
                         </button>
                     </div>
@@ -208,17 +224,17 @@
                 <i class="fa-solid fa-box-open text-4xl text-slate-300"></i>
                 <h3 class="text-sm font-bold text-slate-700">No se encontraron productos</h3>
                 <p class="text-xs text-slate-400">Prueba cambiando los criterios de búsqueda o limpiando los filtros.</p>
-                <button onclick="resetFilters()" class="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-bold">Limpiar Filtros</button>
+                <button onclick="resetFilters()" class="h-10 px-4 bg-blue-600 text-white rounded-xl text-xs font-bold">Limpiar Filtros</button>
             </div>
 
             <!-- Cards View Grid -->
-            <div id="cardsView" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-3">
+            <div id="cardsView" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
                 <!-- Dynamic Content Generated by JS -->
             </div>
 
-            <!-- Table View -->
-            <div id="tableView" class="hidden bg-white rounded-xl border border-slate-200/90 shadow-xs overflow-hidden">
-                <div class="overflow-x-auto max-h-[600px] overflow-y-auto">
+            <!-- Table View (solo md+) -->
+            <div id="tableView" class="hidden bg-white rounded-xl border border-slate-200/90 shadow-sm overflow-hidden">
+                <div class="overflow-x-auto max-h-[70vh] overflow-y-auto">
                     <table class="w-full text-left border-collapse text-xs">
                         <thead class="bg-slate-900 text-slate-200 uppercase font-bold sticky top-0 z-10 text-[11px]">
                             <tr>
@@ -239,17 +255,26 @@
                     </table>
                 </div>
             </div>
+
+            <!-- Mostrar más -->
+            <div id="showMoreWrap" class="hidden pt-1">
+                <button onclick="showMore()" class="w-full h-12 bg-white hover:bg-slate-50 active:bg-slate-100 border border-slate-300 text-slate-700 text-sm font-bold rounded-xl shadow-sm">
+                    <i class="fa-solid fa-chevron-down text-blue-600 mr-1"></i>
+                    Mostrar más (<span id="remaining-count">0</span> restantes)
+                </button>
+            </div>
         </div>
 
         <!-- TAB 2: CHECKLIST TURNOS & SALON -->
         <div id="tab-checklist" class="hidden space-y-4">
-            
-            <div class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/90 shadow-sm space-y-3">
-                <div class="flex items-center justify-between">
-                    <h2 class="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
-                        <i class="fa-solid fa-tasks text-blue-600"></i> Control Diario de Cartelería & Punteras Aniversario I
+
+            <div class="bg-white rounded-2xl p-3.5 sm:p-5 border border-slate-200/90 shadow-sm space-y-3">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <h2 class="text-base sm:text-lg font-black text-slate-900 flex items-start gap-2 leading-snug">
+                        <i class="fa-solid fa-tasks text-blue-600 mt-1"></i>
+                        <span>Control Diario de Cartelería & Punteras Aniversario I</span>
                     </h2>
-                    <button onclick="resetChecklist()" class="text-xs text-rose-600 font-bold hover:underline">
+                    <button onclick="resetChecklist()" class="self-start sm:self-auto h-9 px-3 text-xs text-rose-600 font-bold rounded-lg border border-rose-200 bg-rose-50 hover:bg-rose-100 whitespace-nowrap">
                         <i class="fa-solid fa-rotate"></i> Reiniciar Chequeo
                     </button>
                 </div>
@@ -257,18 +282,27 @@
                     Marca cada ítem a medida que verificas el salón de ventas antes de la apertura o durante el relevamiento de turno.
                 </p>
 
-                <!-- Checklist Items -->
-                <div class="space-y-2 pt-2" id="checklistItemsContainer">
+                <div class="space-y-1.5">
+                    <div class="flex items-center justify-between text-xs font-bold">
+                        <span class="text-slate-600">Progreso</span>
+                        <span id="checklistProgressText" class="text-emerald-600">0 / 0</span>
+                    </div>
+                    <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+                        <div id="checklistProgressBar" class="h-full bg-emerald-500 rounded-full transition-all duration-300" style="width:0%"></div>
+                    </div>
+                </div>
+
+                <div class="space-y-2 pt-1" id="checklistItemsContainer">
                     <!-- Populated dynamically by JS -->
                 </div>
             </div>
 
-            <!-- Limit Rules Reminder -->
             <div class="bg-amber-50 rounded-2xl p-4 border border-amber-200 text-amber-900 space-y-2">
-                <h3 class="text-xs font-black uppercase tracking-wider flex items-center gap-1.5 text-amber-800">
-                    <i class="fa-solid fa-hand-paper text-amber-600"></i> Topes Destacados de Compra Express (Aniversario I)
+                <h3 class="text-xs font-black uppercase tracking-wider flex items-start gap-1.5 text-amber-800 leading-snug">
+                    <i class="fa-solid fa-hand-paper text-amber-600 mt-0.5"></i>
+                    <span>Topes Destacados de Compra Express (Aniversario I)</span>
                 </h3>
-                <ul class="text-xs space-y-1.5 pl-4 list-disc font-medium text-amber-800/90">
+                <ul class="text-xs space-y-2 pl-4 list-disc font-medium text-amber-800/90 leading-relaxed">
                     <li><strong>Cervezas Andes Blanca & Negra (1L, Lata 710cc, Lata 473cc, Porrón 340cc):</strong> Máximo 48 unidades por cliente.</li>
                     <li><strong>Gaseosas Pepsi, 7Up, Paso de los Toros, Mirinda, Schweppes:</strong> Máximo 48 unidades.</li>
                     <li><strong>Aguas Aquarius, H2OH!, Villa del Sur (Bidón y Pet):</strong> Máximo 24 unidades.</li>
@@ -281,38 +315,50 @@
 
     </main>
 
-    <!-- IMPORT DATA MODAL -->
-    <div id="importModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-xs z-50 hidden flex items-center justify-center p-3 sm:p-5 no-print">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl flex flex-col overflow-hidden border border-slate-100">
-            <div class="bg-slate-900 text-white px-4 py-3 flex items-center justify-between border-b border-slate-800">
-                <div class="flex items-center gap-2">
+    <!-- BOTTOM NAV (mobile / tablet) -->
+    <nav class="bottom-nav lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur border-t border-slate-200 shadow-[0_-4px_12px_rgba(15,23,42,0.06)] flex no-print" aria-label="Secciones">
+        <button class="nav-btn active" data-tab="tab-promos" onclick="switchTab('tab-promos')">
+            <i class="fa-solid fa-boxes-stacked"></i>
+            <span>Catálogo</span>
+        </button>
+        <button class="nav-btn" data-tab="tab-checklist" onclick="switchTab('tab-checklist')">
+            <i class="fa-solid fa-square-check"></i>
+            <span>Checklist</span>
+        </button>
+    </nav>
+
+    <!-- IMPORT DATA MODAL (bottom sheet en mobile) -->
+    <div id="importModal" onclick="if(event.target===this)closeImportModal()" class="fixed inset-0 bg-slate-900/80 z-50 hidden flex items-end sm:items-center justify-center sm:p-5 no-print">
+        <div class="bg-white sm:rounded-2xl rounded-t-2xl shadow-2xl w-full max-w-2xl max-h-[92vh] flex flex-col overflow-hidden border border-slate-100">
+            <div class="bg-slate-900 text-white px-4 py-3 flex items-center justify-between gap-3 border-b border-slate-800 shrink-0">
+                <div class="flex items-center gap-2.5 min-w-0">
                     <i class="fa-solid fa-file-csv text-emerald-400 text-lg"></i>
-                    <div>
-                        <h3 class="text-sm font-bold">Pegar / Agregar Planilla Adicional</h3>
-                        <p class="text-[11px] text-slate-400">Pega tus filas directo desde Excel o archivo de texto</p>
+                    <div class="min-w-0">
+                        <h3 class="text-sm font-bold truncate">Pegar / Agregar Planilla</h3>
+                        <p class="text-[11px] text-slate-400 truncate">Pega tus filas directo desde Excel o texto</p>
                     </div>
                 </div>
-                <button onclick="closeImportModal()" class="text-slate-400 hover:text-white p-1">
+                <button onclick="closeImportModal()" aria-label="Cerrar" class="w-10 h-10 -mr-2 text-slate-400 hover:text-white shrink-0">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
-            <div class="p-4 space-y-3">
+            <div class="p-4 space-y-3 overflow-y-auto">
                 <p class="text-xs text-slate-600">
                     Puedes pegar filas separadas por tabulaciones o punto y coma (;).
-                    <br><span class="text-[11px] text-slate-400">Formato reconocido: <code>EAN;Seccion;Categoria;Marca;Descripcion;Mecanica;PVP_Normal;PVP_Oferta;Max</code></span>
+                    <br><span class="text-[11px] text-slate-400 break-words">Formato reconocido: <code>EAN;Seccion;Categoria;Marca;Descripcion;Mecanica;PVP_Normal;PVP_Oferta;Max</code></span>
                 </p>
-                <textarea id="csvImportText" rows="8" placeholder="EAN;Sección;Categoría;Marca;Descripción;Mecánica;PVP Normal;PVP Oferta;Tope&#10;7790070336200;SECO;GALLETITAS;MATARAZZO;FIDEOS PENNE RIGATE MATARAZZO X 500 GRS;PRECIO PRODUCTO;2099;1230;-"
-                    class="w-full p-2.5 text-xs font-mono border border-slate-300 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white"></textarea>
+                <textarea id="csvImportText" rows="7" placeholder="EAN;Sección;Categoría;Marca;Descripción;Mecánica;PVP Normal;PVP Oferta;Tope&#10;7790070336200;SECO;GALLETITAS;MATARAZZO;FIDEOS PENNE RIGATE MATARAZZO X 500 GRS;PRECIO PRODUCTO;2099;1230;-"
+                    class="w-full p-3 font-mono border border-slate-300 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white"></textarea>
             </div>
-            <div class="bg-slate-100 px-4 py-2.5 border-t border-slate-200 flex items-center justify-between">
-                <button onclick="clearCustomData()" class="px-3 py-1.5 bg-rose-100 text-rose-700 hover:bg-rose-200 text-xs font-bold rounded-lg">
+            <div class="bg-slate-100 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] border-t border-slate-200 flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-2 shrink-0">
+                <button onclick="clearCustomData()" class="h-11 sm:h-10 px-3 bg-rose-100 text-rose-700 hover:bg-rose-200 text-xs font-bold rounded-xl">
                     Restaurar Base Aniversario I
                 </button>
-                <div class="flex gap-2">
-                    <button onclick="closeImportModal()" class="px-3 py-1.5 bg-slate-300 hover:bg-slate-400 text-slate-800 text-xs font-bold rounded-lg">
+                <div class="grid grid-cols-2 sm:flex gap-2">
+                    <button onclick="closeImportModal()" class="h-11 sm:h-10 px-4 bg-slate-300 hover:bg-slate-400 text-slate-800 text-xs font-bold rounded-xl">
                         Cancelar
                     </button>
-                    <button onclick="processCustomImport()" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg shadow-sm">
+                    <button onclick="processCustomImport()" class="h-11 sm:h-10 px-4 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-sm">
                         Procesar e Importar
                     </button>
                 </div>
@@ -321,8 +367,8 @@
     </div>
 
     <!-- TOAST -->
-    <div id="toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 sm:left-auto sm:right-5 sm:translate-x-0 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl text-xs flex items-center gap-2 transition-all duration-300 transform translate-y-20 opacity-0 z-50 border border-slate-800">
-        <i class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
+    <div id="toast" role="status" aria-live="polite" class="fixed left-1/2 -translate-x-1/2 bottom-[calc(4.75rem+env(safe-area-inset-bottom))] lg:bottom-5 lg:left-auto lg:right-5 lg:translate-x-0 max-w-[calc(100vw-1.5rem)] bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl text-xs flex items-center gap-2 transition-all duration-300 transform translate-y-20 opacity-0 pointer-events-none z-50 border border-slate-800">
+        <i class="fa-solid fa-circle-check text-emerald-400 text-base shrink-0"></i>
         <span id="toast-msg" class="font-medium">Acción completada</span>
     </div>
 
@@ -330,6 +376,32 @@
         let masterData = [];
         let filteredData = [];
         let currentViewMode = 'cards';
+        const PAGE_SIZE = 40;
+        let visibleCount = PAGE_SIZE;
+        const desktopMQ = window.matchMedia('(min-width: 768px)');
+
+        const SECTION_STYLES = {
+            'BEBIDAS': { accent: 'border-l-blue-500',    chip: 'bg-blue-50 text-blue-700' },
+            'D.P.H.':  { accent: 'border-l-purple-500',  chip: 'bg-purple-50 text-purple-700' },
+            'P.A.S.':  { accent: 'border-l-emerald-500', chip: 'bg-emerald-50 text-emerald-700' },
+            'SECO':    { accent: 'border-l-amber-500',   chip: 'bg-amber-50 text-amber-700' }
+        };
+        const DEFAULT_SECTION_STYLE = { accent: 'border-l-slate-400', chip: 'bg-slate-100 text-slate-700' };
+
+        // Escapa texto antes de inyectarlo en innerHTML (los datos pueden venir de una planilla pegada)
+        function esc(v) {
+            return String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        }
+
+        function storageGet(key) {
+            try { return localStorage.getItem(key); } catch (e) { return null; }
+        }
+        function storageSet(key, value) {
+            try { localStorage.setItem(key, value); } catch (e) { /* modo privado / sin storage */ }
+        }
+        function storageRemove(key) {
+            try { localStorage.removeItem(key); } catch (e) { /* noop */ }
+        }
 
         // EXACT DATASET FROM "INTERNAS EXPRESS - ANIVERSARIO I" (02/10/2026 al 08/10/2026)
         const exactAniversarioDataset = [
@@ -611,7 +683,7 @@
             masterData = [];
             
             // Check for Custom Data from Import
-            const customDataStr = localStorage.getItem('express_aniversario1_custom_data');
+            const customDataStr = storageGet('express_aniversario1_custom_data');
             if (customDataStr) {
                 try {
                     masterData = JSON.parse(customDataStr);
@@ -663,97 +735,126 @@
             populateSelect('filterMecanica', [...new Set(masterData.map(d => d.mecanica))].sort());
         }
 
+        function effectiveViewMode() {
+            // En pantallas chicas la tabla no es usable: siempre cards
+            return desktopMQ.matches ? currentViewMode : 'cards';
+        }
+
+        function buildCard(item) {
+            const style = SECTION_STYLES[item.seccion] || DEFAULT_SECTION_STYLE;
+            const card = document.createElement('article');
+            card.className = `bg-white rounded-xl border border-slate-200/90 border-l-4 ${style.accent} shadow-sm p-3.5 flex flex-col gap-3`;
+
+            const hasOferta = item.pvpOferta && item.pvpOferta !== '-';
+            const hasMax = item.max && item.max !== '-';
+            const hasSub = item.submarca && item.submarca !== '-' && item.submarca !== item.marca;
+            const hasContenido = item.contenido && item.contenido !== '-';
+            const isCustom = item.origen && item.origen.indexOf('Importaci') === 0;
+
+            card.innerHTML = `
+                <div class="flex items-center gap-2 flex-wrap text-[11px] font-bold uppercase tracking-wide">
+                    <span class="px-2 py-0.5 rounded-md ${style.chip}">${esc(item.seccion)}</span>
+                    ${item.categoria && item.categoria !== '-' ? `<span class="text-slate-500 break-words">${esc(item.categoria)}</span>` : ''}
+                    ${isCustom ? `<span class="px-2 py-0.5 rounded-md bg-slate-100 text-slate-500 normal-case">Importado</span>` : ''}
+                </div>
+                <div class="min-w-0">
+                    <h4 class="text-[15px] font-bold text-slate-900 leading-snug break-words">${esc(item.descripcion)}</h4>
+                    <p class="text-xs text-slate-500 mt-1 break-words">
+                        <i class="fa-solid fa-tag text-[10px] mr-1 text-slate-400"></i><strong>${esc(item.marca)}</strong>${hasSub ? ` (${esc(item.submarca)})` : ''}${hasContenido ? ` · ${esc(item.contenido)}` : ''}
+                    </p>
+                </div>
+                <div class="flex flex-wrap items-center gap-1.5">
+                    <span class="text-xs font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-1 rounded-lg break-words">
+                        <i class="fa-solid fa-percent text-[10px] mr-1"></i>${esc(item.mecanica)}
+                    </span>
+                    ${hasMax ? `
+                    <span class="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 px-2.5 py-1 rounded-lg">
+                        <i class="fa-solid fa-hand text-[10px] mr-1"></i>Tope ${esc(item.max)}
+                    </span>` : ''}
+                </div>
+                ${hasOferta ? `
+                <div class="flex items-center justify-between gap-2 p-2.5 rounded-lg bg-emerald-50/60 border border-emerald-100">
+                    <div class="flex items-baseline gap-2">
+                        <span class="text-xs text-slate-400 line-through">${esc(item.pvpNormal)}</span>
+                        <span class="text-lg font-black text-emerald-600 leading-none">${esc(item.pvpOferta)}</span>
+                    </div>
+                    <span class="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded">OFERTA</span>
+                </div>` : ''}
+                <div class="mt-auto pt-2.5 border-t border-slate-100 flex items-center justify-between gap-2">
+                    <span class="font-mono text-xs font-bold text-slate-600 break-all">${esc(item.ean)}</span>
+                    <button data-ean="${esc(item.ean)}" onclick="copyEAN(this.dataset.ean)" class="shrink-0 h-10 px-3.5 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-700 text-xs font-bold rounded-lg flex items-center gap-1.5 transition-colors">
+                        <i class="fa-regular fa-copy"></i> Copiar EAN
+                    </button>
+                </div>
+            `;
+            return card;
+        }
+
+        function buildRow(item) {
+            const hasMax = item.max && item.max !== '-';
+            const row = document.createElement('tr');
+            row.className = "hover:bg-slate-50 transition-colors";
+            row.innerHTML = `
+                <td class="p-2.5 border-b font-mono font-bold text-[11px]">${esc(item.ean)}</td>
+                <td class="p-2.5 border-b text-[11px] text-slate-600"><span class="font-bold text-slate-800">${esc(item.seccion)}</span><br><span class="text-[10px] text-slate-500">${esc(item.categoria)}</span></td>
+                <td class="p-2.5 border-b font-bold text-[11px]">${esc(item.marca)}</td>
+                <td class="p-2.5 border-b font-semibold text-slate-800">${esc(item.descripcion)}</td>
+                <td class="p-2.5 border-b font-bold text-blue-700">${esc(item.mecanica)}</td>
+                <td class="p-2.5 border-b text-right text-slate-400 line-through">${esc(item.pvpNormal)}</td>
+                <td class="p-2.5 border-b text-right font-black text-emerald-600">${esc(item.pvpOferta)}</td>
+                <td class="p-2.5 border-b text-center font-bold ${hasMax ? 'text-rose-600' : 'text-slate-400'}">${esc(item.max || '-')}</td>
+                <td class="p-2.5 border-b text-center">
+                    <button data-ean="${esc(item.ean)}" onclick="copyEAN(this.dataset.ean)" aria-label="Copiar EAN" class="p-2 text-slate-500 hover:text-slate-800">
+                        <i class="fa-regular fa-copy"></i>
+                    </button>
+                </td>
+            `;
+            return row;
+        }
+
         function renderViews() {
             const cardsContainer = document.getElementById('cardsView');
+            const tableView = document.getElementById('tableView');
             const tableBody = document.getElementById('tableBody');
             const emptyState = document.getElementById('emptyState');
+            const showMoreWrap = document.getElementById('showMoreWrap');
 
             cardsContainer.innerHTML = '';
             tableBody.innerHTML = '';
+            updateKPIs();
 
             if (filteredData.length === 0) {
                 cardsContainer.classList.add('hidden');
-                document.getElementById('tableView').classList.add('hidden');
+                tableView.classList.add('hidden');
+                showMoreWrap.classList.add('hidden');
                 emptyState.classList.remove('hidden');
                 return;
             }
 
             emptyState.classList.add('hidden');
-            if (currentViewMode === 'cards') {
-                cardsContainer.classList.remove('hidden');
-                document.getElementById('tableView').classList.add('hidden');
-            } else {
-                cardsContainer.classList.add('hidden');
-                document.getElementById('tableView').classList.remove('hidden');
-            }
+            const mode = effectiveViewMode();
+            cardsContainer.classList.toggle('hidden', mode !== 'cards');
+            tableView.classList.toggle('hidden', mode !== 'table');
 
-            filteredData.forEach(item => {
-                // Card View Element
-                const card = document.createElement('div');
-                card.className = "bg-white p-3 rounded-xl border border-slate-200/90 shadow-xs flex flex-col justify-between space-y-2 relative hover:shadow-md transition-shadow";
+            // Solo se pinta la vista activa y por tandas, para que el celular no se trabe
+            const slice = filteredData.slice(0, visibleCount);
+            const frag = document.createDocumentFragment();
+            slice.forEach(item => frag.appendChild(mode === 'cards' ? buildCard(item) : buildRow(item)));
+            (mode === 'cards' ? cardsContainer : tableBody).appendChild(frag);
 
-                card.innerHTML = `
-                    <div class="space-y-1.5">
-                        <div class="flex items-center justify-between gap-1 text-[10px]">
-                            <span class="px-2 py-0.5 rounded-md border bg-emerald-50 text-emerald-800 border-emerald-200 font-bold truncate">${item.origen}</span>
-                            <span class="font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md truncate">${item.seccion} • ${item.categoria}</span>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-xs text-slate-900 leading-tight">${item.descripcion}</h4>
-                            <p class="text-[11px] text-slate-500 font-medium mt-0.5"><i class="fa-solid fa-tag text-[10px] mr-1 text-slate-400"></i><strong>${item.marca}</strong> ${item.submarca && item.submarca !== '-' && item.submarca !== item.marca ? `(${item.submarca})` : ''}</p>
-                        </div>
-                        <div class="p-2 rounded-lg bg-slate-50 border border-slate-100 text-xs space-y-1">
-                            <div class="flex justify-between items-center">
-                                <span class="text-[11px] text-slate-500 font-medium">Mecánica Promo:</span>
-                                <span class="font-bold text-blue-700 text-xs bg-blue-50 px-2 py-0.5 rounded border border-blue-200">${item.mecanica}</span>
-                            </div>
-                            ${item.pvpOferta !== '-' ? `
-                            <div class="flex justify-between items-center pt-1 border-t border-slate-200/60">
-                                <div>
-                                    <span class="text-[10px] text-slate-400 line-through mr-1">${item.pvpNormal}</span>
-                                    <span class="text-xs font-black text-emerald-600">${item.pvpOferta}</span>
-                                </div>
-                                <span class="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded">OFERTA</span>
-                            </div>
-                            ` : ''}
-                            ${item.max && item.max !== '-' ? `
-                            <div class="text-[10px] font-bold text-rose-600 pt-0.5 flex items-center gap-1">
-                                <i class="fa-solid fa-hand"></i> Límite Tope: ${item.max}
-                            </div>
-                            ` : ''}
-                        </div>
-                    </div>
-                    <div class="pt-1.5 border-t border-slate-100 flex items-center justify-between text-[10px]">
-                        <span class="text-slate-500 font-mono font-bold">${item.ean}</span>
-                        <button onclick="copyEAN('${item.ean}')" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-md flex items-center gap-1 active:scale-95 transition-transform">
-                            <i class="fa-regular fa-copy"></i> Copiar EAN
-                        </button>
-                    </div>
-                `;
-                cardsContainer.appendChild(card);
+            const remaining = filteredData.length - slice.length;
+            document.getElementById('remaining-count').textContent = remaining;
+            showMoreWrap.classList.toggle('hidden', remaining <= 0);
+        }
 
-                // Table Row Element
-                const row = document.createElement('tr');
-                row.className = "hover:bg-slate-50 transition-colors";
-                row.innerHTML = `
-                    <td class="p-2.5 border-b font-mono font-bold text-[11px]">${item.ean}</td>
-                    <td class="p-2.5 border-b text-[11px] text-slate-600"><span class="font-bold text-slate-800">${item.seccion}</span><br><span class="text-[10px] text-slate-500">${item.categoria}</span></td>
-                    <td class="p-2.5 border-b font-bold text-[11px]">${item.marca}</td>
-                    <td class="p-2.5 border-b font-semibold text-slate-800">${item.descripcion}</td>
-                    <td class="p-2.5 border-b font-bold text-blue-700">${item.mecanica}</td>
-                    <td class="p-2.5 border-b text-right text-slate-400 line-through">${item.pvpNormal}</td>
-                    <td class="p-2.5 border-b text-right font-black text-emerald-600">${item.pvpOferta}</td>
-                    <td class="p-2.5 border-b text-center font-bold ${item.max && item.max !== '-' ? 'text-rose-600' : 'text-slate-400'}">${item.max || '-'}</td>
-                    <td class="p-2.5 border-b text-center">
-                        <button onclick="copyEAN('${item.ean}')" class="p-1 text-slate-500 hover:text-slate-800">
-                            <i class="fa-regular fa-copy"></i>
-                        </button>
-                    </td>
-                `;
-                tableBody.appendChild(row);
-            });
+        function showMore() {
+            visibleCount += PAGE_SIZE;
+            renderViews();
+        }
 
-            updateKPIs();
+        function onSearchInput() {
+            clearTimeout(onSearchInput._t);
+            onSearchInput._t = setTimeout(applyFilters, 120);
         }
 
         function updateKPIs() {
@@ -787,6 +888,13 @@
 
             document.getElementById('clearSearchBtn').classList.toggle('hidden', query === '');
 
+            const activeFilters = [seccion, categoria, marca, mecanica].filter(Boolean).length;
+            const badge = document.getElementById('filterBadge');
+            badge.textContent = activeFilters;
+            badge.classList.toggle('hidden', activeFilters === 0);
+            badge.classList.toggle('inline-flex', activeFilters > 0);
+
+            visibleCount = PAGE_SIZE;
             filteredData = masterData.filter(item => {
                 const matchesSearch = query === '' ||
                     item.descripcion.toLowerCase().includes(query) ||
@@ -824,37 +932,28 @@
             currentViewMode = mode;
             const btnCards = document.getElementById('viewCardsBtn');
             const btnTable = document.getElementById('viewTableBtn');
-
-            if (mode === 'cards') {
-                btnCards.className = "px-2.5 py-1 text-xs font-bold rounded-lg transition-all bg-white text-slate-900 shadow-xs";
-                btnTable.className = "px-2.5 py-1 text-xs font-semibold rounded-lg transition-all text-slate-600 hover:text-slate-900";
-            } else {
-                btnTable.className = "px-2.5 py-1 text-xs font-bold rounded-lg transition-all bg-white text-slate-900 shadow-xs";
-                btnCards.className = "px-2.5 py-1 text-xs font-semibold rounded-lg transition-all text-slate-600 hover:text-slate-900";
-            }
+            const on = "px-3 py-1.5 text-xs font-bold rounded-lg transition-all bg-white text-slate-900 shadow-sm";
+            const off = "px-3 py-1.5 text-xs font-semibold rounded-lg transition-all text-slate-600 hover:text-slate-900";
+            btnCards.className = mode === 'cards' ? on : off;
+            btnTable.className = mode === 'table' ? on : off;
             renderViews();
         }
 
         function toggleFilterContainer() {
             const container = document.getElementById('filterContainer');
-            container.classList.toggle('hidden');
+            const open = container.classList.toggle('hidden') === false;
+            document.getElementById('filterToggleBtn').setAttribute('aria-expanded', String(open));
         }
 
         function switchTab(tabId) {
-            document.getElementById('tab-promos').classList.add('hidden');
-            document.getElementById('tab-checklist').classList.add('hidden');
-
-            document.getElementById('nav-promos').className = "px-3 py-1.5 rounded-lg text-slate-400 hover:text-white flex items-center gap-1.5 shrink-0";
-            document.getElementById('nav-checklist').className = "px-3 py-1.5 rounded-lg text-slate-400 hover:text-white flex items-center gap-1.5 shrink-0";
-
-            if (tabId === 'tab-promos') {
-                document.getElementById('tab-promos').classList.remove('hidden');
-                document.getElementById('nav-promos').className = "px-3 py-1.5 rounded-lg text-blue-400 bg-slate-800 border border-slate-700 flex items-center gap-1.5 shrink-0 font-bold";
-            } else if (tabId === 'tab-checklist') {
-                document.getElementById('tab-checklist').classList.remove('hidden');
-                document.getElementById('nav-checklist').className = "px-3 py-1.5 rounded-lg text-amber-400 bg-slate-800 border border-slate-700 flex items-center gap-1.5 shrink-0 font-bold";
-                renderChecklist();
-            }
+            ['tab-promos', 'tab-checklist'].forEach(id => {
+                document.getElementById(id).classList.toggle('hidden', id !== tabId);
+            });
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.tab === tabId);
+            });
+            if (tabId === 'tab-checklist') renderChecklist();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         const checklistTasks = [
@@ -867,51 +966,67 @@
             "Artículos D.P.H. (Dove, Gillette, Ayudín 2L, Cif Bioactive, Mr Músculo) controlados con tope de 8u."
         ];
 
+        function getChecklistState() {
+            try { return JSON.parse(storageGet('express_aniversario1_checklist') || '{}'); } catch (e) { return {}; }
+        }
+
         function renderChecklist() {
             const container = document.getElementById('checklistItemsContainer');
             container.innerHTML = '';
 
-            const savedState = JSON.parse(localStorage.getItem('express_aniversario1_checklist') || '{}');
+            const savedState = getChecklistState();
+            let done = 0;
 
             checklistTasks.forEach((task, idx) => {
-                const isChecked = savedState[idx] || false;
-                const div = document.createElement('div');
-                div.className = `p-3 rounded-xl border transition-all flex items-center justify-between gap-3 ${isChecked ? 'bg-emerald-50/70 border-emerald-200 text-emerald-950' : 'bg-slate-50 border-slate-200 text-slate-800'}`;
-                div.innerHTML = `
-                    <label class="flex items-center gap-3 cursor-pointer flex-1 text-xs sm:text-sm font-medium">
-                        <input type="checkbox" onchange="toggleTask(${idx})" ${isChecked ? 'checked' : ''} class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500">
-                        <span class="${isChecked ? 'line-through text-slate-500' : ''}">${task}</span>
-                    </label>
-                    <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${isChecked ? 'bg-emerald-200 text-emerald-800' : 'bg-slate-200 text-slate-600'}">
-                        ${isChecked ? 'OK' : 'Pendiente'}
-                    </span>
+                const isChecked = !!savedState[idx];
+                if (isChecked) done++;
+                const label = document.createElement('label');
+                label.className = `p-3.5 rounded-xl border transition-colors flex items-start gap-3 cursor-pointer active:scale-[0.99] ${isChecked ? 'bg-emerald-50/70 border-emerald-200 text-emerald-950' : 'bg-slate-50 border-slate-200 text-slate-800'}`;
+                label.innerHTML = `
+                    <input type="checkbox" ${isChecked ? 'checked' : ''} class="mt-0.5 w-6 h-6 shrink-0 accent-emerald-600 rounded">
+                    <span class="flex-1 text-sm font-medium leading-snug ${isChecked ? 'line-through text-slate-500' : ''}">${esc(task)}</span>
+                    <span class="hidden sm:inline shrink-0 text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${isChecked ? 'bg-emerald-200 text-emerald-800' : 'bg-slate-200 text-slate-600'}">${isChecked ? 'OK' : 'Pendiente'}</span>
                 `;
-                container.appendChild(div);
+                label.querySelector('input').addEventListener('change', () => toggleTask(idx));
+                container.appendChild(label);
             });
+
+            document.getElementById('checklistProgressText').textContent = `${done} / ${checklistTasks.length}`;
+            document.getElementById('checklistProgressBar').style.width = `${checklistTasks.length ? Math.round(done / checklistTasks.length * 100) : 0}%`;
         }
 
         function toggleTask(idx) {
-            const savedState = JSON.parse(localStorage.getItem('express_aniversario1_checklist') || '{}');
+            const savedState = getChecklistState();
             savedState[idx] = !savedState[idx];
-            localStorage.setItem('express_aniversario1_checklist', JSON.stringify(savedState));
+            storageSet('express_aniversario1_checklist', JSON.stringify(savedState));
             renderChecklist();
         }
 
         function resetChecklist() {
-            localStorage.removeItem('express_aniversario1_checklist');
+            storageRemove('express_aniversario1_checklist');
             renderChecklist();
-            showToast("Checklist reestablished");
+            showToast("Checklist reiniciado");
         }
 
         function copyEAN(ean) {
             if (!ean || ean === '-') return;
-            const el = document.createElement('textarea');
-            el.value = ean;
-            document.body.appendChild(el);
-            el.select();
-            document.execCommand('copy');
-            document.body.removeChild(el);
-            showToast(`EAN ${ean} copiado`);
+            const done = () => showToast(`EAN ${ean} copiado`);
+            const fallback = () => {
+                const el = document.createElement('textarea');
+                el.value = ean;
+                el.setAttribute('readonly', '');
+                el.style.cssText = 'position:fixed;top:0;left:0;opacity:0';
+                document.body.appendChild(el);
+                el.select();
+                el.setSelectionRange(0, ean.length);
+                try { document.execCommand('copy'); done(); } catch (e) { showToast("No se pudo copiar el EAN"); }
+                document.body.removeChild(el);
+            };
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(ean).then(done, fallback);
+            } else {
+                fallback();
+            }
         }
 
         function exportToCSV() {
@@ -938,11 +1053,17 @@
 
         function openImportModal() {
             document.getElementById('importModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
         }
 
         function closeImportModal() {
             document.getElementById('importModal').classList.add('hidden');
+            document.body.style.overflow = '';
         }
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') closeImportModal();
+        });
 
         function processCustomImport() {
             const text = document.getElementById('csvImportText').value.trim();
@@ -980,7 +1101,7 @@
 
             if (newMaster.length > 0) {
                 masterData = newMaster;
-                localStorage.setItem('express_aniversario1_custom_data', JSON.stringify(masterData));
+                storageSet('express_aniversario1_custom_data', JSON.stringify(masterData));
                 populateFilters();
                 applyFilters();
                 closeImportModal();
@@ -991,7 +1112,7 @@
         }
 
         function clearCustomData() {
-            localStorage.removeItem('express_aniversario1_custom_data');
+            storageRemove('express_aniversario1_custom_data');
             buildMasterDataset();
             populateFilters();
             applyFilters();
@@ -1004,11 +1125,15 @@
             document.getElementById('toast-msg').textContent = msg;
             toast.classList.remove('translate-y-20', 'opacity-0');
             toast.classList.add('translate-y-0', 'opacity-100');
-            setTimeout(() => {
+            clearTimeout(showToast._t);
+            showToast._t = setTimeout(() => {
                 toast.classList.remove('translate-y-0', 'opacity-100');
                 toast.classList.add('translate-y-20', 'opacity-0');
-            }, 3000);
+            }, 2500);
         }
+
+        // Si se rota el celular / se cambia de ancho, re-renderiza (tabla solo en md+)
+        desktopMQ.addEventListener('change', renderViews);
 
         window.onload = function() {
             buildMasterDataset();
